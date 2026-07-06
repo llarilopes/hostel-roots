@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hostel Roots — Painel do Projeto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --sand: #E8DCC8;
+    --dark: #1A1A1A;
+    --mid: #2C2C2C;
+    --card: #242424;
+    --reggae: #D4A017;
+    --rock: #C0392B;
+    --surf: #2980B9;
+    --green: #27AE60;
+    --text: #E0D8CC;
+    --muted: #888;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--mid);
+    border-bottom: 3px solid var(--reggae);
+    padding: 20px 24px 16px;
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 3px;
+    color: var(--sand);
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: var(--mid);
+    border-bottom: 1px solid #333;
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .tab.active { color: var(--sand); border-bottom-color: var(--reggae); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .panel { display: none; padding: 20px 16px; }
+  .panel.active { display: block; }
+
+  /* CARDS */
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .kpi {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 4px solid var(--reggae);
+  }
+
+  .kpi.rock { border-left-color: var(--rock); }
+  .kpi.surf { border-left-color: var(--surf); }
+  .kpi.green { border-left-color: var(--green); }
+
+  .kpi-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .kpi-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--sand);
+    line-height: 1;
+  }
+
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* CRONOGRAMA */
+  .phase {
+    background: var(--card);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+
+  .phase-title {
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .phase-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .phase-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: #333;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .phase-badge.andamento { background: #2980B920; color: var(--surf); }
+  .phase-badge.pendente { background: #33333360; color: var(--muted); }
+
+  .phase-body { padding: 0 16px 14px; display: none; }
+  .phase-body.open { display: block; }
+
+  .task {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-top: 1px solid #2e2e2e;
+  }
+
+  .task input[type="checkbox"] {
+    margin-top: 2px;
+    accent-color: var(--reggae);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .task-text { font-size: 13px; }
+  .task-text.done { text-decoration: line-through; color: var(--muted); }
+  .task-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* FINANCEIRO */
+  .finance-section { margin-bottom: 20px; }
+  .finance-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .finance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--card);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .finance-row span:last-child { font-weight: 600; color: var(--sand); }
+
+  .finance-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #1e1e1e;
+    border: 1px solid var(--reggae);
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  .finance-total span:last-child { color: var(--reggae); }
+
+  /* CENÁRIOS */
+  .scenario-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .scenario {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+
+  .scenario-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .scenario-value {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .scenario-occ { font-size: 11px; color: var(--muted); }
+
+  .bar-container {
+    background: #2e2e2e;
+    border-radius: 4px;
+    height: 6px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .bar { height: 100%; border-radius: 4px; }
+
+  /* TEMAS */
+  .themes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .theme-card {
+    border-radius: 8px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+
+  .theme-card.reggae { background: linear-gradient(135deg, #2d2000, #4a3800); border: 1px solid var(--reggae); }
+  .theme-card.rock   { background: linear-gradient(135deg, #2d0000, #4a0000); border: 1px solid var(--rock); }
+  .theme-card.surf   { background: linear-gradient(135deg, #001a2d, #002d4a); border: 1px solid var(--surf); }
+
+  .theme-icon { font-size: 28px; margin-bottom: 8px; }
+  .theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; }
+  .theme-desc { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+  .idea-list { list-style: none; }
+  .idea-list li {
+    padding: 9px 14px;
+    background: var(--card);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .idea-list li::before { content: "→"; color: var(--reggae); flex-shrink: 0; }
+
+  .progress-bar-outer {
+    background: #2e2e2e;
+    border-radius: 4px;
+    height: 8px;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    overflow: hidden;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--reggae), var(--surf));
+    transition: width 0.5s;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌊 Hostel Roots</h1>
+  <p>Painel de Projeto — Aracaju, SE</p>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('visao')">Visão Geral</div>
+  <div class="tab" onclick="showTab('cronograma')">Cronograma</div>
+  <div class="tab" onclick="showTab('financeiro')">Financeiro</div>
+  <div class="tab" onclick="showTab('conceito')">Conceito</div>
+  <div class="tab" onclick="showTab('receita')">📈 Receita</div>
+</div>
+
+<!-- VISÃO GERAL -->
+<div class="panel active" id="visao">
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-label">Investimento Total</div>
+      <div class="kpi-value">R$79K</div>
+      <div class="kpi-sub">Estimativa média</div>
+    </div>
+    <div class="kpi rock">
+      <div class="kpi-label">Custo Fixo/Mês</div>
+      <div class="kpi-value">R$12K</div>
+      <div class="kpi-sub">Estimativa média</div>
+    </div>
+    <div class="kpi surf">
+      <div class="kpi-label">Receita Potencial</div>
+      <div class="kpi-value">R$52K</div>
+      <div class="kpi-sub">Hospedagem + ancillary</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-label">Break-even</div>
+      <div class="kpi-value">5 meses</div>
+      <div class="kpi-sub">Com receitas extras ativas</div>
+    </div>
+  </div>
+
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="globalProgress" style="width: 0%"></div>
+  </div>
+  <div class="progress-label">
+    <span>Progresso do Projeto</span>
+    <span id="progressPct">0%</span>
+  </div>
+
+  <div class="finance-title">Localização Recomendada</div>
+  <div class="finance-row">
+    <span>🏆 1ª opção</span>
+    <span>Coroa do Meio</span>
+  </div>
+  <div class="finance-row">
+    <span>🔁 Alternativa</span>
+    <span>Atalaia</span>
+  </div>
+  <div class="finance-row">
+    <span>🌿 Vibe Surf</span>
+    <span>Aruana</span>
+  </div>
+
+  <br>
+  <div class="finance-title">Diferenciais do Negócio</div>
+  <ul class="idea-list">
+    <li>3 alas temáticas: Reggae, Rock e Surf</li>
+    <li>Bar com drinks autorais na área comum</li>
+    <li>Noite de música ao vivo semanal</li>
+    <li>Pacote cama + aula de surf</li>
+    <li>Aluguel de pranchas e bicicletas</li>
+  </ul>
+</div>
+
+<!-- CRONOGRAMA -->
+<div class="panel" id="cronograma">
+
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <div class="phase-dot" style="background: var(--reggae)"></div>
+        Fase 1 — Planejamento
+      </div>
+      <span class="phase-badge andamento">Mês 1–2</span>
+    </div>
+    <div class="phase-body">
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Definir bairro e visitar imóveis</div><div class="task-meta">Coroa do Meio, Atalaia ou Aruana</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Abrir CNPJ como ME (ramo: hospedagem)</div><div class="task-meta">CÓD: 5510-8/01 — Hotéis e similares</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Assinar contrato de aluguel</div><div class="task-meta">Negociar uso comercial explicitamente</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Contratar arquiteto para projeto das 3 alas</div><div class="task-meta">Reggae / Rock / Surf</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Solicitar alvará de funcionamento na prefeitura</div><div class="task-meta">Vigilância sanitária + bombeiros</div></div></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <div class="phase-dot" style="background: var(--surf)"></div>
+        Fase 2 — Estruturação
+      </div>
+      <span class="phase-badge pendente">Mês 2–4</span>
+    </div>
+    <div class="phase-body">
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Executar reforma e decoração temática</div><div class="task-meta">Budget: R$ 20.000 – 35.000</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Comprar beliches e mobiliário (20 camas)</div><div class="task-meta">Budget: R$ 8.000 – 15.000</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Instalar Wi-Fi, ar-condicionado e equipamentos</div><div class="task-meta">Budget: R$ 8.000 – 12.000</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Criar identidade visual e redes sociais</div><div class="task-meta">Instagram, TikTok, Google Meu Negócio</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Cadastrar no Booking, Airbnb e Hostelworld</div><div class="task-meta">Fotos profissionais obrigatórias</div></div></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <div class="phase-dot" style="background: var(--rock)"></div>
+        Fase 3 — Parcerias
+      </div>
+      <span class="phase-badge pendente">Mês 3–4</span>
+    </div>
+    <div class="phase-body">
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Fechar parceria com escola de surf local</div><div class="task-meta">Pacote cama + aula com desconto</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Parceria com bares e restaurantes da orla</div><div class="task-meta">Indicação mútua de clientes</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Contratar músico local para noite semanal</div><div class="task-meta">Reggae ou rock acústico</div></div></div>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-header" onclick="togglePhase(this)">
+      <div class="phase-title">
+        <div class="phase-dot" style="background: var(--green)"></div>
+        Fase 4 — Lançamento
+      </div>
+      <span class="phase-badge pendente">Mês 4–5</span>
+    </div>
+    <div class="phase-body">
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Soft opening com preços promocionais</div><div class="task-meta">-30% nas primeiras 4 semanas</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Campanha de lançamento nas redes sociais</div><div class="task-meta">Reels, stories e influencers locais de surf</div></div></div>
+      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Coletar primeiras avaliações no Booking/Google</div><div class="task-meta">Meta: 10 avaliações 5 estrelas no 1º mês</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCEIRO -->
+<div class="panel" id="financeiro">
+  <div class="finance-section">
+    <div class="finance-title">Investimento Inicial</div>
+    <div class="finance-row"><span>Reforma + decoração temática</span><span>R$ 27.500</span></div>
+    <div class="finance-row"><span>Beliches + colchões (20 camas)</span><span>R$ 11.500</span></div>
+    <div class="finance-row"><span>Equipamentos (ar, Wi-Fi, TV)</span><span>R$ 10.000</span></div>
+    <div class="finance-row"><span>Registro, alvará e CNPJ</span><span>R$ 4.000</span></div>
+    <div class="finance-row"><span>Marketing inicial + fotos + site</span><span>R$ 4.500</span></div>
+    <div class="finance-row"><span>Capital de giro (3 meses)</span><span>R$ 21.500</span></div>
+    <div class="finance-total"><span>Total Estimado</span><span>R$ 79.000</span></div>
+  </div>
+
+  <div class="finance-section">
+    <div class="finance-title">Custos Fixos Mensais</div>
+    <div class="finance-row"><span>Aluguel do imóvel</span><span>R$ 5.750</span></div>
+    <div class="finance-row"><span>Energia elétrica</span><span>R$ 1.500</span></div>
+    <div class="finance-row"><span>Água</span><span>R$ 550</span></div>
+    <div class="finance-row"><span>Internet + streaming</span><span>R$ 300</span></div>
+    <div class="finance-row"><span>Funcionários (1–2 pessoas)</span><span>R$ 4.000</span></div>
+    <div class="finance-row"><span>Plataformas (~15% receita)</span><span>R$ 3.750</span></div>
+    <div class="finance-row"><span>Manutenção e limpeza</span><span>R$ 800</span></div>
+    <div class="finance-total"><span>Total Mensal</span><span>R$ 16.650</span></div>
+  </div>
+
+  <div class="finance-section">
+    <div class="finance-title">Cenários de Receita (20 camas)</div>
+    <div class="scenario-row">
+      <div class="scenario">
+        <div class="scenario-label">Pessimista</div>
+        <div class="scenario-value" style="color: var(--rock)">R$13K</div>
+        <div class="scenario-occ">40% ocup.</div>
+        <div class="bar-container"><div class="bar" style="width:40%; background: var(--rock)"></div></div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-label">Realista</div>
+        <div class="scenario-value" style="color: var(--reggae)">R$25K</div>
+        <div class="scenario-occ">65% ocup.</div>
+        <div class="bar-container"><div class="bar" style="width:65%; background: var(--reggae)"></div></div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-label">Otimista</div>
+        <div class="scenario-value" style="color: var(--green)">R$38K</div>
+        <div class="scenario-occ">90% ocup.</div>
+        <div class="bar-container"><div class="bar" style="width:90%; background: var(--green)"></div></div>
+      </div>
+    </div>
+    <div class="finance-row"><span>Receita ancillary (bar + atividades)</span><span style="color: var(--reggae)">+R$ 27.000/mês</span></div>
+    <div class="finance-row"><span>Receita total realista (hosped. + extras)</span><span style="color: var(--sand)">~R$ 52.000/mês</span></div>
+    <div class="finance-row"><span>Lucro líquido com receitas extras</span><span style="color: var(--green)">~R$ 28.000/mês</span></div>
+    <div class="finance-row"><span>Break-even estimado</span><span>~5 meses</span></div>
+  </div>
+</div>
+
+<!-- CONCEITO -->
+<div class="panel" id="conceito">
+  <div class="themes">
+    <div class="theme-card reggae">
+      <div class="theme-icon">🎵</div>
+      <div class="theme-name" style="color: var(--reggae)">Reggae</div>
+      <div class="theme-desc">Cores quentes, palha, madeira, Bob Marley vibes</div>
+    </div>
+    <div class="theme-card rock">
+      <div class="theme-icon">🎸</div>
+      <div class="theme-name" style="color: var(--rock)">Rock</div>
+      <div class="theme-desc">Tijolos expostos, preto, pôsteres vintage e neon</div>
+    </div>
+    <div class="theme-card surf">
+      <div class="theme-icon">🏄</div>
+      <div class="theme-name" style="color: var(--surf)">Surf</div>
+      <div class="theme-desc">Azul oceano, branco, pranchas na parede, madeira clara</div>
+    </div>
+  </div>
+
+  <div class="finance-title">Experiências Extras (Receita Adicional)</div>
+  <ul class="idea-list">
+    <li>Bar roots na área comum — drinks com nomes temáticos (R$ 15–35 cada)</li>
+    <li>Noite de música ao vivo — cover simbólico ou consumação mínima</li>
+    <li>Pacote "Surf + Cama" com escola parceira</li>
+    <li>Aluguel de pranchas e bikes por hora/dia</li>
+    <li>Café da manhã regional opcional (R$ 20–30/pessoa)</li>
+    <li>Passeios guiados para Crôa do Goré e Cânion do Xingó</li>
+  </ul>
+
+  <br>
+  <div class="finance-title">Público-Alvo</div>
+  <ul class="idea-list">
+    <li>Surfistas e praticantes de esportes aquáticos</li>
+    <li>Mochileiros nacionais e internacionais (25–40 anos)</li>
+    <li>Amantes de música e cultura alternativa</li>
+    <li>Casais e amigos em viagem de fim de semana</li>
+  </ul>
+</div>
+
+<!-- RECEITA -->
+<div class="panel" id="receita">
+
+  <div class="finance-section">
+    <div class="finance-title">Receita de Hospedagem vs Ancillary</div>
+    <div class="scenario-row">
+      <div class="scenario">
+        <div class="scenario-label">Hospedagem</div>
+        <div class="scenario-value" style="color: var(--surf)">R$25K</div>
+        <div class="scenario-occ">65% ocup. · 20 camas</div>
+        <div class="bar-container"><div class="bar" style="width:48%; background: var(--surf)"></div></div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-label">Bar + Eventos</div>
+        <div class="scenario-value" style="color: var(--reggae)">R$18K</div>
+        <div class="scenario-occ">20 hósp. × R$40/dia</div>
+        <div class="bar-container"><div class="bar" style="width:34%; background: var(--reggae)"></div></div>
+      </div>
+      <div class="scenario">
+        <div class="scenario-label">Atividades</div>
+        <div class="scenario-value" style="color: var(--green)">R$9K</div>
+        <div class="scenario-occ">Surf, passeios, bikes</div>
+        <div class="bar-container"><div class="bar" style="width:18%; background: var(--green)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="finance-section">
+    <div class="finance-title">🏄 Alavanca 1 — Precificação Dinâmica</div>
+    <div class="finance-row"><span>Diária base (seg–qui)</span><span>R$ 75</span></div>
+    <div class="finance-row"><span>Diária fim de semana</span><span>R$ 120</span></div>
+    <div class="finance-row"><span>Feriados / alta temporada</span><span>R$ 150–180</span></div>
+    <div class="finance-row"><span>Réveillon / Carnaval</span><span>R$ 200–250</span></div>
+    <div class="finance-total"><span>Impacto estimado</span><span>+30–40% receita</span></div>
+  </div>
+
+  <div class="finance-section">
+    <div class="finance-title">🍹 Alavanca 2 — Bar Roots</div>
+    <div class="finance-row"><span>20 hóspedes × R$ 40/dia (média)</span><span>R$ 800/dia</span></div>
+    <div class="finance-row"><span>Público externo (noite de show)</span><span>+R$ 1.500/semana</span></div>
+    <div class="finance-row"><span>Cobertura mínima noite de música</span><span>R$ 20/pessoa</span></div>
+    <div class="finance-total"><span>Receita bar estimada/mês</span><span>~R$ 18.000</span></div>
+  </div>
+
+  <div class="finance-section">
+    <div class="finance-title">🎯 Alavanca 3 — Pacotes Premium</div>
+    <div class="finance-row"><span>Pacote "Surf Week" (7n + 5 aulas)</span><span>R$ 1.200–1.500/pessoa</span></div>
+    <div class="finance-row"><span>Pacote "Roots Weekend" (2n + bar open)</span><span>R$ 380–450/pessoa</span></div>
+    <div class="finance-row"><span>Passeio Crôa do Goré + Xingó</span><span>R$ 120–180/pessoa</span></div>
+    <div class="finance-row"><span>Aluguel prancha/bike por dia</span><span>R$ 50–80/unidade</span></div>
+    <div class="finance-total"><span>Receita atividades estimada/mês</span><span>~R$ 9.000</span></div>
+  </div>
+
+  <div class="finance-section">
+    <div class="finance-title">📊 Projeção de Crescimento (12 meses)</div>
+    <div class="finance-row"><span>Mês 1–3 (rodagem)</span><span style="color:var(--rock)">R$ 18–25K/mês</span></div>
+    <div class="finance-row"><span>Mês 4–6 (parcerias ativas)</span><span style="color:var(--reggae)">R$ 30–40K/mês</span></div>
+    <div class="finance-row"><span>Mês 7–9 (marca consolidada)</span><span style="color:var(--surf)">R$ 42–52K/mês</span></div>
+    <div class="finance-row"><span>Mês 10–12 (alta temporada)</span><span style="color:var(--green)">R$ 55–75K/mês</span></div>
+    <div class="finance-total"><span>Lucro líquido ano 1 (médio)</span><span>~R$ 22–28K/mês</span></div>
+  </div>
+
+  <div class="finance-section">
+    <div class="finance-title">⚡ Ações de Alto Impacto (Quick Wins)</div>
+    <ul class="idea-list">
+      <li>Ativar o bar desde o dia 1 — é receita imediata sem custo fixo extra</li>
+      <li>Fechar parceria de surf antes da abertura — já abre com pacote vendável</li>
+      <li>Cadastrar no Hostelworld além do Booking — público hostel é diferente</li>
+      <li>TikTok da reforma em tempo real — gera audiência antes de abrir</li>
+      <li>Abrir para eventos externos nas quintas-feiras — ocupa espaço ocioso</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function togglePhase(header) {
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+  }
+
+  function updateProgress() {
+    const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
+    let done = 0;
+    checkboxes.forEach(cb => {
+      const label = cb.closest('.task').querySelector('.task-text');
+      if (cb.checked) {
+        label.classList.add('done');
+        done++;
+      } else {
+        label.classList.remove('done');
+      }
+    });
+    const pct = Math.round((done / checkboxes.length) * 100);
+    document.getElementById('globalProgress').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+  }
+
+  // Abrir primeira fase por padrão
+  document.querySelector('.phase-body').classList.add('open');
+</script>
+</body>
+</html>
