@@ -629,6 +629,46 @@
 </div>
 
 <script>
+  // ── Atribui IDs estáveis a cada checkbox ──
+  document.querySelectorAll('.task input[type="checkbox"]').forEach((cb, i) => {
+    cb.dataset.id = 'task-' + i;
+  });
+
+  // ── Persistência via localStorage ──
+  function saveProgress() {
+    const state = {};
+    document.querySelectorAll('.task input[type="checkbox"]').forEach(cb => {
+      state[cb.dataset.id] = cb.checked;
+    });
+    localStorage.setItem('hostelroots_tasks', JSON.stringify(state));
+  }
+
+  function loadProgress() {
+    const saved = localStorage.getItem('hostelroots_tasks');
+    if (!saved) return;
+    const state = JSON.parse(saved);
+    document.querySelectorAll('.task input[type="checkbox"]').forEach(cb => {
+      if (state[cb.dataset.id]) {
+        cb.checked = true;
+        cb.closest('.task').querySelector('.task-text').classList.add('done');
+      }
+    });
+  }
+
+  function updateProgress() {
+    const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
+    let done = 0;
+    checkboxes.forEach(cb => {
+      const label = cb.closest('.task').querySelector('.task-text');
+      if (cb.checked) { label.classList.add('done'); done++; }
+      else { label.classList.remove('done'); }
+    });
+    const pct = Math.round((done / checkboxes.length) * 100);
+    document.getElementById('globalProgress').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    saveProgress();
+  }
+
   function showTab(id) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -637,28 +677,12 @@
   }
 
   function togglePhase(header) {
-    const body = header.nextElementSibling;
-    body.classList.toggle('open');
+    header.nextElementSibling.classList.toggle('open');
   }
 
-  function updateProgress() {
-    const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
-    let done = 0;
-    checkboxes.forEach(cb => {
-      const label = cb.closest('.task').querySelector('.task-text');
-      if (cb.checked) {
-        label.classList.add('done');
-        done++;
-      } else {
-        label.classList.remove('done');
-      }
-    });
-    const pct = Math.round((done / checkboxes.length) * 100);
-    document.getElementById('globalProgress').style.width = pct + '%';
-    document.getElementById('progressPct').textContent = pct + '%';
-  }
-
-  // Abrir primeira fase por padrão
+  // ── Init ──
+  loadProgress();
+  updateProgress();
   document.querySelector('.phase-body').classList.add('open');
 </script>
 </body>
