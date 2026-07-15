@@ -4,686 +4,453 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hostel Roots — Painel do Projeto</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap');
-
-  :root {
-    --sand: #E8DCC8;
-    --dark: #1A1A1A;
-    --mid: #2C2C2C;
-    --card: #242424;
-    --reggae: #D4A017;
-    --rock: #C0392B;
-    --surf: #2980B9;
-    --green: #27AE60;
-    --text: #E0D8CC;
-    --muted: #888;
-  }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--dark);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-
-  header {
-    background: var(--mid);
-    border-bottom: 3px solid var(--reggae);
-    padding: 20px 24px 16px;
-  }
-
-  header h1 {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 36px;
-    letter-spacing: 3px;
-    color: var(--sand);
-  }
-
-  header p {
-    color: var(--muted);
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-
-  .tabs {
-    display: flex;
-    gap: 0;
-    background: var(--mid);
-    border-bottom: 1px solid #333;
-    overflow-x: auto;
-  }
-
-  .tab {
-    padding: 12px 20px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    border-bottom: 3px solid transparent;
-    white-space: nowrap;
-    transition: all 0.2s;
-  }
-
-  .tab.active { color: var(--sand); border-bottom-color: var(--reggae); }
-  .tab:hover:not(.active) { color: var(--text); }
-
-  .panel { display: none; padding: 20px 16px; }
-  .panel.active { display: block; }
-
-  /* CARDS */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .kpi {
-    background: var(--card);
-    border-radius: 8px;
-    padding: 16px;
-    border-left: 4px solid var(--reggae);
-  }
-
-  .kpi.rock { border-left-color: var(--rock); }
-  .kpi.surf { border-left-color: var(--surf); }
-  .kpi.green { border-left-color: var(--green); }
-
-  .kpi-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .kpi-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    color: var(--sand);
-    line-height: 1;
-  }
-
-  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-  /* CRONOGRAMA */
-  .phase {
-    background: var(--card);
-    border-radius: 8px;
-    margin-bottom: 12px;
-    overflow: hidden;
-  }
-
-  .phase-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 16px;
-    cursor: pointer;
-  }
-
-  .phase-title {
-    font-weight: 600;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .phase-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-  }
-
-  .phase-badge {
-    font-size: 10px;
-    padding: 2px 8px;
-    border-radius: 20px;
-    background: #333;
-    color: var(--muted);
-    font-weight: 500;
-  }
-
-  .phase-badge.andamento { background: #2980B920; color: var(--surf); }
-  .phase-badge.pendente { background: #33333360; color: var(--muted); }
-
-  .phase-body { padding: 0 16px 14px; display: none; }
-  .phase-body.open { display: block; }
-
-  .task {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 8px 0;
-    border-top: 1px solid #2e2e2e;
-  }
-
-  .task input[type="checkbox"] {
-    margin-top: 2px;
-    accent-color: var(--reggae);
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  .task-text { font-size: 13px; }
-  .task-text.done { text-decoration: line-through; color: var(--muted); }
-  .task-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-  /* FINANCEIRO */
-  .finance-section { margin-bottom: 20px; }
-  .finance-title {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-
-  .finance-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    background: var(--card);
-    border-radius: 6px;
-    margin-bottom: 6px;
-    font-size: 13px;
-  }
-
-  .finance-row span:last-child { font-weight: 600; color: var(--sand); }
-
-  .finance-total {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 14px;
-    background: #1e1e1e;
-    border: 1px solid var(--reggae);
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 14px;
-    margin-top: 8px;
-  }
-
-  .finance-total span:last-child { color: var(--reggae); }
-
-  /* CENÁRIOS */
-  .scenario-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-
-  .scenario {
-    background: var(--card);
-    border-radius: 8px;
-    padding: 14px 12px;
-    text-align: center;
-  }
-
-  .scenario-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .scenario-value {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .scenario-occ { font-size: 11px; color: var(--muted); }
-
-  .bar-container {
-    background: #2e2e2e;
-    border-radius: 4px;
-    height: 6px;
-    margin-top: 8px;
-    overflow: hidden;
-  }
-
-  .bar { height: 100%; border-radius: 4px; }
-
-  /* TEMAS */
-  .themes {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .theme-card {
-    border-radius: 8px;
-    padding: 16px 12px;
-    text-align: center;
-  }
-
-  .theme-card.reggae { background: linear-gradient(135deg, #2d2000, #4a3800); border: 1px solid var(--reggae); }
-  .theme-card.rock   { background: linear-gradient(135deg, #2d0000, #4a0000); border: 1px solid var(--rock); }
-  .theme-card.surf   { background: linear-gradient(135deg, #001a2d, #002d4a); border: 1px solid var(--surf); }
-
-  .theme-icon { font-size: 28px; margin-bottom: 8px; }
-  .theme-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; }
-  .theme-desc { font-size: 10px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
-
-  .idea-list { list-style: none; }
-  .idea-list li {
-    padding: 9px 14px;
-    background: var(--card);
-    border-radius: 6px;
-    margin-bottom: 6px;
-    font-size: 13px;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
-  .idea-list li::before { content: "→"; color: var(--reggae); flex-shrink: 0; }
-
-  .progress-bar-outer {
-    background: #2e2e2e;
-    border-radius: 4px;
-    height: 8px;
-    margin-top: 16px;
-    margin-bottom: 6px;
-    overflow: hidden;
-  }
-
-  .progress-bar-inner {
-    height: 100%;
-    border-radius: 4px;
-    background: linear-gradient(90deg, var(--reggae), var(--surf));
-    transition: width 0.5s;
-  }
-
-  .progress-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
+  body { background: #0b1e2a; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { opacity: 1; }
 </style>
 </head>
 <body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
 
-<header>
-  <h1>🌊 Hostel Roots</h1>
-  <p>Painel de Projeto — Aracaju, SE</p>
-</header>
+// localStorage polyfill para persistência fora do Claude
+const storage = {
+  get: (key) => { try { return localStorage.getItem(key); } catch(e) { return null; } },
+  set: (key, val) => { try { localStorage.setItem(key, val); } catch(e) {} }
+};
 
-<div class="tabs">
-  <div class="tab active" onclick="showTab('visao')">Visão Geral</div>
-  <div class="tab" onclick="showTab('cronograma')">Cronograma</div>
-  <div class="tab" onclick="showTab('financeiro')">Financeiro</div>
-  <div class="tab" onclick="showTab('conceito')">Conceito</div>
-  <div class="tab" onclick="showTab('receita')">📈 Receita</div>
-</div>
+const ALAS = {
+  reggae: { label: "Reggae", emoji: "🎵", from: "#c8a84b", to: "#2d6a1f", accent: "#e8b84b", sub: "Cores quentes · palha · madeira" },
+  rock:   { label: "Rock",   emoji: "🎸", from: "#c0392b", to: "#1a1a1a", accent: "#ff4444", sub: "Tijolo exposto · preto · neon" },
+  surf:   { label: "Surf",   emoji: "🏄", from: "#1a6fa8", to: "#0e3d5c", accent: "#5fb8ae", sub: "Azul oceano · pranchas · luz solar" },
+};
 
-<!-- VISÃO GERAL -->
-<div class="panel active" id="visao">
-  <div class="kpi-row">
-    <div class="kpi">
-      <div class="kpi-label">Investimento Total</div>
-      <div class="kpi-value">R$79K</div>
-      <div class="kpi-sub">Estimativa média</div>
-    </div>
-    <div class="kpi rock">
-      <div class="kpi-label">Custo Fixo/Mês</div>
-      <div class="kpi-value">R$12K</div>
-      <div class="kpi-sub">Estimativa média</div>
-    </div>
-    <div class="kpi surf">
-      <div class="kpi-label">Receita Potencial</div>
-      <div class="kpi-value">R$52K</div>
-      <div class="kpi-sub">Hospedagem + ancillary</div>
-    </div>
-    <div class="kpi green">
-      <div class="kpi-label">Break-even</div>
-      <div class="kpi-value">5 meses</div>
-      <div class="kpi-sub">Com receitas extras ativas</div>
-    </div>
-  </div>
+const FASES_INICIAIS = [
+  { id: "p1", nome: "Planejamento", periodo: "Mês 1–2", cor: "#5fb8ae",
+    tarefas: [
+      "Definir bairro e visitar imóveis (Coroa do Meio, Atalaia ou Aruana)",
+      "Abrir CNPJ como ME (5510-8/01 — Hotéis e similares)",
+      "Assinar contrato de aluguel com uso comercial explícito",
+      "Contratar arquiteto para o projeto das 3 alas (Reggae, Rock, Surf)",
+      "Solicitar alvará de funcionamento (vigilância sanitária + bombeiros)",
+    ]},
+  { id: "p2", nome: "Estruturação", periodo: "Mês 2–4", cor: "#e8b84b",
+    tarefas: [
+      "Executar reforma e decoração temática",
+      "Comprar beliches e mobiliário (20 camas)",
+      "Instalar Wi-Fi, ar-condicionado e equipamentos",
+      "Criar identidade visual e redes sociais",
+      "Cadastrar no Booking, Airbnb e Hostelworld",
+    ]},
+  { id: "p3", nome: "Parcerias", periodo: "Mês 3–4", cor: "#c8a84b",
+    tarefas: [
+      "Fechar parceria com escola de surf local",
+      "Parceria com bares e restaurantes da orla",
+      "Contratar músico local para a noite semanal",
+    ]},
+  { id: "p4", nome: "Lançamento", periodo: "Mês 4–5", cor: "#e0654f",
+    tarefas: [
+      "Soft opening com preços promocionais (−30% nas 4 primeiras semanas)",
+      "Campanha de lançamento nas redes sociais",
+      "Coletar primeiras avaliações (meta: 10 avaliações 5★ no 1º mês)",
+    ]},
+].map(f => ({ ...f, tarefas: f.tarefas.map((t, i) => ({ id: `${f.id}-${i}`, texto: t, feito: false })) }));
 
-  <div class="progress-bar-outer">
-    <div class="progress-bar-inner" id="globalProgress" style="width: 0%"></div>
-  </div>
-  <div class="progress-label">
-    <span>Progresso do Projeto</span>
-    <span id="progressPct">0%</span>
-  </div>
+const FINANCEIRO_INICIAL = {
+  investimento: [
+    { label: "Reforma e decoração temática", valor: 27500 },
+    { label: "Beliches e colchões (20 camas)", valor: 11500 },
+    { label: "Equipamentos (ar, Wi-Fi, TV)", valor: 10000 },
+    { label: "Registro, alvará e CNPJ", valor: 4000 },
+    { label: "Marketing inicial + fotos + site", valor: 4500 },
+    { label: "Capital de giro (3 meses)", valor: 21500 },
+  ],
+  custosFixos: [
+    { label: "Aluguel do imóvel", valor: 5750 },
+    { label: "Energia elétrica", valor: 1500 },
+    { label: "Água", valor: 550 },
+    { label: "Internet + streaming", valor: 300 },
+    { label: "Funcionários (1–2 pessoas)", valor: 4000 },
+    { label: "Plataformas (~15% da receita)", valor: 3750 },
+    { label: "Manutenção e limpeza", valor: 800 },
+  ],
+  camas: 20, diariaBase: 75, diariaFimSemana: 120,
+  ocupacao: { pessimista: 40, realista: 65, otimista: 90 },
+  barPorCamaDia: 40, atividadesMes: 9000,
+};
 
-  <div class="finance-title">Localização Recomendada</div>
-  <div class="finance-row">
-    <span>🏆 1ª opção</span>
-    <span>Coroa do Meio</span>
-  </div>
-  <div class="finance-row">
-    <span>🔁 Alternativa</span>
-    <span>Atalaia</span>
-  </div>
-  <div class="finance-row">
-    <span>🌿 Vibe Surf</span>
-    <span>Aruana</span>
-  </div>
+const fmt = n => "R$ " + Math.round(n).toLocaleString("pt-BR");
 
-  <br>
-  <div class="finance-title">Diferenciais do Negócio</div>
-  <ul class="idea-list">
-    <li>3 alas temáticas: Reggae, Rock e Surf</li>
-    <li>Bar com drinks autorais na área comum</li>
-    <li>Noite de música ao vivo semanal</li>
-    <li>Pacote cama + aula de surf</li>
-    <li>Aluguel de pranchas e bicicletas</li>
-  </ul>
-</div>
+function calcular(fin) {
+  const totalInvestimento = fin.investimento.reduce((s, i) => s + Number(i.valor || 0), 0);
+  const totalCustoFixo = fin.custosFixos.reduce((s, i) => s + Number(i.valor || 0), 0);
+  const diariaMedia = (Number(fin.diariaBase) * 5 + Number(fin.diariaFimSemana) * 2) / 7;
+  const cenario = (ocupPct) => {
+    const receitaHospedagem = fin.camas * diariaMedia * 30 * (ocupPct / 100);
+    const receitaBar = fin.camas * fin.barPorCamaDia * 30 * (ocupPct / 100);
+    const receitaAtividades = Number(fin.atividadesMes || 0);
+    const receitaTotal = receitaHospedagem + receitaBar + receitaAtividades;
+    const lucro = receitaTotal - totalCustoFixo;
+    return { receitaHospedagem, receitaBar, receitaAtividades, receitaTotal, lucro };
+  };
+  const pessimista = cenario(fin.ocupacao.pessimista);
+  const realista = cenario(fin.ocupacao.realista);
+  const otimista = cenario(fin.ocupacao.otimista);
+  const breakEven = realista.lucro > 0 ? Math.ceil(totalInvestimento / realista.lucro) : null;
+  return { totalInvestimento, totalCustoFixo, diariaMedia, pessimista, realista, otimista, breakEven };
+}
 
-<!-- CRONOGRAMA -->
-<div class="panel" id="cronograma">
+function WaveDivider() {
+  return (
+    <svg viewBox="0 0 800 40" style={{display:"block",width:"100%",height:40,margin:"0 0 -2px"}} preserveAspectRatio="none">
+      <path d="M0 20 Q100 5 200 20 T400 20 T600 20 T800 20 V40 H0Z" fill="#5fb8ae" opacity="0.22"/>
+      <path d="M0 28 Q120 12 240 28 T480 28 T720 28 T800 28 V40 H0Z" fill="#5fb8ae" opacity="0.13"/>
+    </svg>
+  );
+}
 
-  <div class="phase">
-    <div class="phase-header" onclick="togglePhase(this)">
-      <div class="phase-title">
-        <div class="phase-dot" style="background: var(--reggae)"></div>
-        Fase 1 — Planejamento
+function TideBar({ pct }) {
+  return (
+    <div style={{maxWidth:680,margin:"0 auto 28px",padding:"0 4px"}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:6,alignItems:"flex-end"}}>
+        <span style={{fontFamily:"monospace",fontSize:11,letterSpacing:".12em",color:"#5fb8ae",textTransform:"uppercase"}}>Progresso do projeto</span>
+        <span style={{fontFamily:"monospace",fontSize:13,color:"#e8b84b",fontWeight:600}}>{pct}%</span>
       </div>
-      <span class="phase-badge andamento">Mês 1–2</span>
-    </div>
-    <div class="phase-body">
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Definir bairro e visitar imóveis</div><div class="task-meta">Coroa do Meio, Atalaia ou Aruana</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Abrir CNPJ como ME (ramo: hospedagem)</div><div class="task-meta">CÓD: 5510-8/01 — Hotéis e similares</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Assinar contrato de aluguel</div><div class="task-meta">Negociar uso comercial explicitamente</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Contratar arquiteto para projeto das 3 alas</div><div class="task-meta">Reggae / Rock / Surf</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Solicitar alvará de funcionamento na prefeitura</div><div class="task-meta">Vigilância sanitária + bombeiros</div></div></div>
-    </div>
-  </div>
-
-  <div class="phase">
-    <div class="phase-header" onclick="togglePhase(this)">
-      <div class="phase-title">
-        <div class="phase-dot" style="background: var(--surf)"></div>
-        Fase 2 — Estruturação
-      </div>
-      <span class="phase-badge pendente">Mês 2–4</span>
-    </div>
-    <div class="phase-body">
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Executar reforma e decoração temática</div><div class="task-meta">Budget: R$ 20.000 – 35.000</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Comprar beliches e mobiliário (20 camas)</div><div class="task-meta">Budget: R$ 8.000 – 15.000</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Instalar Wi-Fi, ar-condicionado e equipamentos</div><div class="task-meta">Budget: R$ 8.000 – 12.000</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Criar identidade visual e redes sociais</div><div class="task-meta">Instagram, TikTok, Google Meu Negócio</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Cadastrar no Booking, Airbnb e Hostelworld</div><div class="task-meta">Fotos profissionais obrigatórias</div></div></div>
-    </div>
-  </div>
-
-  <div class="phase">
-    <div class="phase-header" onclick="togglePhase(this)">
-      <div class="phase-title">
-        <div class="phase-dot" style="background: var(--rock)"></div>
-        Fase 3 — Parcerias
-      </div>
-      <span class="phase-badge pendente">Mês 3–4</span>
-    </div>
-    <div class="phase-body">
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Fechar parceria com escola de surf local</div><div class="task-meta">Pacote cama + aula com desconto</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Parceria com bares e restaurantes da orla</div><div class="task-meta">Indicação mútua de clientes</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Contratar músico local para noite semanal</div><div class="task-meta">Reggae ou rock acústico</div></div></div>
-    </div>
-  </div>
-
-  <div class="phase">
-    <div class="phase-header" onclick="togglePhase(this)">
-      <div class="phase-title">
-        <div class="phase-dot" style="background: var(--green)"></div>
-        Fase 4 — Lançamento
-      </div>
-      <span class="phase-badge pendente">Mês 4–5</span>
-    </div>
-    <div class="phase-body">
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Soft opening com preços promocionais</div><div class="task-meta">-30% nas primeiras 4 semanas</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Campanha de lançamento nas redes sociais</div><div class="task-meta">Reels, stories e influencers locais de surf</div></div></div>
-      <div class="task"><input type="checkbox" onchange="updateProgress()"><div><div class="task-text">Coletar primeiras avaliações no Booking/Google</div><div class="task-meta">Meta: 10 avaliações 5 estrelas no 1º mês</div></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- FINANCEIRO -->
-<div class="panel" id="financeiro">
-  <div class="finance-section">
-    <div class="finance-title">Investimento Inicial</div>
-    <div class="finance-row"><span>Reforma + decoração temática</span><span>R$ 27.500</span></div>
-    <div class="finance-row"><span>Beliches + colchões (20 camas)</span><span>R$ 11.500</span></div>
-    <div class="finance-row"><span>Equipamentos (ar, Wi-Fi, TV)</span><span>R$ 10.000</span></div>
-    <div class="finance-row"><span>Registro, alvará e CNPJ</span><span>R$ 4.000</span></div>
-    <div class="finance-row"><span>Marketing inicial + fotos + site</span><span>R$ 4.500</span></div>
-    <div class="finance-row"><span>Capital de giro (3 meses)</span><span>R$ 21.500</span></div>
-    <div class="finance-total"><span>Total Estimado</span><span>R$ 79.000</span></div>
-  </div>
-
-  <div class="finance-section">
-    <div class="finance-title">Custos Fixos Mensais</div>
-    <div class="finance-row"><span>Aluguel do imóvel</span><span>R$ 5.750</span></div>
-    <div class="finance-row"><span>Energia elétrica</span><span>R$ 1.500</span></div>
-    <div class="finance-row"><span>Água</span><span>R$ 550</span></div>
-    <div class="finance-row"><span>Internet + streaming</span><span>R$ 300</span></div>
-    <div class="finance-row"><span>Funcionários (1–2 pessoas)</span><span>R$ 4.000</span></div>
-    <div class="finance-row"><span>Plataformas (~15% receita)</span><span>R$ 3.750</span></div>
-    <div class="finance-row"><span>Manutenção e limpeza</span><span>R$ 800</span></div>
-    <div class="finance-total"><span>Total Mensal</span><span>R$ 16.650</span></div>
-  </div>
-
-  <div class="finance-section">
-    <div class="finance-title">Cenários de Receita (20 camas)</div>
-    <div class="scenario-row">
-      <div class="scenario">
-        <div class="scenario-label">Pessimista</div>
-        <div class="scenario-value" style="color: var(--rock)">R$13K</div>
-        <div class="scenario-occ">40% ocup.</div>
-        <div class="bar-container"><div class="bar" style="width:40%; background: var(--rock)"></div></div>
-      </div>
-      <div class="scenario">
-        <div class="scenario-label">Realista</div>
-        <div class="scenario-value" style="color: var(--reggae)">R$25K</div>
-        <div class="scenario-occ">65% ocup.</div>
-        <div class="bar-container"><div class="bar" style="width:65%; background: var(--reggae)"></div></div>
-      </div>
-      <div class="scenario">
-        <div class="scenario-label">Otimista</div>
-        <div class="scenario-value" style="color: var(--green)">R$38K</div>
-        <div class="scenario-occ">90% ocup.</div>
-        <div class="bar-container"><div class="bar" style="width:90%; background: var(--green)"></div></div>
+      <div style={{height:8,background:"#0e2a36",borderRadius:4,overflow:"hidden",border:"1px solid #1e4a5a"}}>
+        <div style={{height:"100%",width:`${pct}%`,background:"linear-gradient(90deg,#1a6fa8 0%,#5fb8ae 50%,#e8b84b 100%)",borderRadius:4,transition:"width .6s cubic-bezier(.4,0,.2,1)",boxShadow:"0 0 12px #5fb8ae66"}}/>
       </div>
     </div>
-    <div class="finance-row"><span>Receita ancillary (bar + atividades)</span><span style="color: var(--reggae)">+R$ 27.000/mês</span></div>
-    <div class="finance-row"><span>Receita total realista (hosped. + extras)</span><span style="color: var(--sand)">~R$ 52.000/mês</span></div>
-    <div class="finance-row"><span>Lucro líquido com receitas extras</span><span style="color: var(--green)">~R$ 28.000/mês</span></div>
-    <div class="finance-row"><span>Break-even estimado</span><span>~5 meses</span></div>
-  </div>
-</div>
+  );
+}
 
-<!-- CONCEITO -->
-<div class="panel" id="conceito">
-  <div class="themes">
-    <div class="theme-card reggae">
-      <div class="theme-icon">🎵</div>
-      <div class="theme-name" style="color: var(--reggae)">Reggae</div>
-      <div class="theme-desc">Cores quentes, palha, madeira, Bob Marley vibes</div>
+const TABS = [
+  {id:"geral",label:"Visão Geral",icon:"◈"},
+  {id:"cronograma",label:"Cronograma",icon:"◷"},
+  {id:"financeiro",label:"Financeiro",icon:"◎"},
+  {id:"notas",label:"Notas",icon:"◉"},
+];
+
+function Nav({ aba, setAba }) {
+  return (
+    <div style={{display:"flex",justifyContent:"center",gap:4,marginBottom:28,padding:"0 8px",flexWrap:"wrap"}}>
+      {TABS.map(t => {
+        const active = aba === t.id;
+        return (
+          <button key={t.id} onClick={() => setAba(t.id)} style={{
+            fontFamily:"'IBM Plex Sans',sans-serif",fontWeight:500,fontSize:13,
+            background:"transparent",border:"none",
+            borderBottom:active?"2px solid #e8b84b":"2px solid transparent",
+            color:active?"#e8b84b":"#6a8f96",
+            padding:"10px 18px 8px",cursor:"pointer",letterSpacing:".02em",
+            transition:"color .2s,border-color .2s",
+            display:"flex",alignItems:"center",gap:6,
+          }}>
+            <span style={{fontSize:15,opacity:active?1:0.5}}>{t.icon}</span>
+            {t.label}
+          </button>
+        );
+      })}
     </div>
-    <div class="theme-card rock">
-      <div class="theme-icon">🎸</div>
-      <div class="theme-name" style="color: var(--rock)">Rock</div>
-      <div class="theme-desc">Tijolos expostos, preto, pôsteres vintage e neon</div>
+  );
+}
+
+function Panel({ label, children, style: s }) {
+  return (
+    <div style={{background:"#112230",border:"1px solid #1e3f4f",borderRadius:8,padding:"20px 20px 18px",marginBottom:16,...s}}>
+      <div style={{fontFamily:"monospace",fontSize:10.5,letterSpacing:".14em",textTransform:"uppercase",color:"#5fb8ae",marginBottom:14}}>{label}</div>
+      {children}
     </div>
-    <div class="theme-card surf">
-      <div class="theme-icon">🏄</div>
-      <div class="theme-name" style="color: var(--surf)">Surf</div>
-      <div class="theme-desc">Azul oceano, branco, pranchas na parede, madeira clara</div>
+  );
+}
+
+function StatCard({ label, value, accent }) {
+  return (
+    <div style={{background:"#112230",border:"1px solid #1e3f4f",borderTop:`3px solid ${accent}`,borderRadius:8,padding:"18px 20px",display:"flex",flexDirection:"column",gap:6}}>
+      <span style={{fontSize:11,color:"#5a8090",textTransform:"uppercase",letterSpacing:".1em",fontFamily:"monospace"}}>{label}</span>
+      <span style={{fontFamily:"monospace",fontSize:22,color:accent,fontWeight:600,lineHeight:1}}>{value}</span>
     </div>
-  </div>
+  );
+}
 
-  <div class="finance-title">Experiências Extras (Receita Adicional)</div>
-  <ul class="idea-list">
-    <li>Bar roots na área comum — drinks com nomes temáticos (R$ 15–35 cada)</li>
-    <li>Noite de música ao vivo — cover simbólico ou consumação mínima</li>
-    <li>Pacote "Surf + Cama" com escola parceira</li>
-    <li>Aluguel de pranchas e bikes por hora/dia</li>
-    <li>Café da manhã regional opcional (R$ 20–30/pessoa)</li>
-    <li>Passeios guiados para Crôa do Goré e Cânion do Xingó</li>
-  </ul>
+function AlaCard({ ala }) {
+  const d = ALAS[ala];
+  return (
+    <div style={{background:`linear-gradient(145deg,${d.from}22,${d.to}44)`,border:`1px solid ${d.accent}33`,borderLeft:`4px solid ${d.accent}`,borderRadius:8,padding:"20px 18px",display:"flex",flexDirection:"column",gap:8}}>
+      <div style={{fontSize:28}}>{d.emoji}</div>
+      <div style={{fontWeight:700,fontSize:17,color:d.accent}}>{d.label}</div>
+      <div style={{fontSize:12,color:"#8fa9ac",lineHeight:1.5}}>{d.sub}</div>
+    </div>
+  );
+}
 
-  <br>
-  <div class="finance-title">Público-Alvo</div>
-  <ul class="idea-list">
-    <li>Surfistas e praticantes de esportes aquáticos</li>
-    <li>Mochileiros nacionais e internacionais (25–40 anos)</li>
-    <li>Amantes de música e cultura alternativa</li>
-    <li>Casais e amigos em viagem de fim de semana</li>
-  </ul>
-</div>
-
-<!-- RECEITA -->
-<div class="panel" id="receita">
-
-  <div class="finance-section">
-    <div class="finance-title">Receita de Hospedagem vs Ancillary</div>
-    <div class="scenario-row">
-      <div class="scenario">
-        <div class="scenario-label">Hospedagem</div>
-        <div class="scenario-value" style="color: var(--surf)">R$25K</div>
-        <div class="scenario-occ">65% ocup. · 20 camas</div>
-        <div class="bar-container"><div class="bar" style="width:48%; background: var(--surf)"></div></div>
+function LocTag({ icon, label, place, accent, primary }) {
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:12,background:primary?`${accent}11`:"#0e2535",border:`1px solid ${primary?accent+"55":"#1e3f4f"}`,borderRadius:8,padding:"10px 16px"}}>
+      <span style={{fontSize:18}}>{icon}</span>
+      <div>
+        <span style={{fontSize:11,color:accent,fontFamily:"monospace",letterSpacing:".08em",textTransform:"uppercase"}}>{label} · </span>
+        <span style={{fontSize:14,fontWeight:primary?600:400,color:primary?"#f3ecdc":"#8fc4cc"}}>{place}</span>
       </div>
-      <div class="scenario">
-        <div class="scenario-label">Bar + Eventos</div>
-        <div class="scenario-value" style="color: var(--reggae)">R$18K</div>
-        <div class="scenario-occ">20 hósp. × R$40/dia</div>
-        <div class="bar-container"><div class="bar" style="width:34%; background: var(--reggae)"></div></div>
-      </div>
-      <div class="scenario">
-        <div class="scenario-label">Atividades</div>
-        <div class="scenario-value" style="color: var(--green)">R$9K</div>
-        <div class="scenario-occ">Surf, passeios, bikes</div>
-        <div class="bar-container"><div class="bar" style="width:18%; background: var(--green)"></div></div>
-      </div>
     </div>
-  </div>
+  );
+}
 
-  <div class="finance-section">
-    <div class="finance-title">🏄 Alavanca 1 — Precificação Dinâmica</div>
-    <div class="finance-row"><span>Diária base (seg–qui)</span><span>R$ 75</span></div>
-    <div class="finance-row"><span>Diária fim de semana</span><span>R$ 120</span></div>
-    <div class="finance-row"><span>Feriados / alta temporada</span><span>R$ 150–180</span></div>
-    <div class="finance-row"><span>Réveillon / Carnaval</span><span>R$ 200–250</span></div>
-    <div class="finance-total"><span>Impacto estimado</span><span>+30–40% receita</span></div>
-  </div>
+function VisaoGeral({ calc }) {
+  return (
+    <div style={{maxWidth:680,margin:"0 auto"}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:20}}>
+        <StatCard label="Investimento total" value={fmt(calc.totalInvestimento)} accent="#e8b84b"/>
+        <StatCard label="Custo fixo / mês" value={fmt(calc.totalCustoFixo)} accent="#e0654f"/>
+        <StatCard label="Receita realista / mês" value={fmt(calc.realista.receitaTotal)} accent="#5fb8ae"/>
+        <StatCard label="Break-even" value={calc.breakEven?`${calc.breakEven} meses`:"—"} accent="#c8a84b"/>
+      </div>
+      <Panel label="Alas temáticas">
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+          {["reggae","rock","surf"].map(a => <AlaCard key={a} ala={a}/>)}
+        </div>
+      </Panel>
+      <Panel label="Localização">
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <LocTag icon="🏆" label="1ª opção" place="Coroa do Meio" accent="#e8b84b" primary/>
+          <LocTag icon="🔁" label="Alternativa" place="Atalaia" accent="#5fb8ae"/>
+          <LocTag icon="🌿" label="Vibe surf" place="Aruana" accent="#c8a84b"/>
+        </div>
+      </Panel>
+      <Panel label="Fontes de receita">
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+          {[["🛏","Hospedagem","20 camas · dorms e privados"],["🍹","Bar temático","Drinks autorais na área comum"],["🎵","Noite ao vivo","Show semanal com artista local"],["🏄","Pacote surf","Cama + aula com escola parceira"],["🚲","Aluguel","Pranchas e bicicletas"],["📦","Pacotes","Atividades e experiências locais"]].map(([ico,tit,sub]) => (
+            <div key={tit} style={{background:"#0e2535",border:"1px solid #1e3f4f",borderRadius:6,padding:"12px 14px",display:"flex",gap:10,alignItems:"flex-start"}}>
+              <span style={{fontSize:18,lineHeight:1}}>{ico}</span>
+              <div>
+                <div style={{fontSize:13,fontWeight:600,color:"#d4e8ec",marginBottom:2}}>{tit}</div>
+                <div style={{fontSize:11.5,color:"#5a8090"}}>{sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Panel>
+      <Panel label="Público-alvo">
+        <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+          {["Surfistas e esportes aquáticos","Mochileiros 25–40 anos","Amantes de música alternativa","Casais e grupos de amigos","Turistas nacionais e internacionais"].map(p => (
+            <span key={p} style={{background:"#0e2535",border:"1px solid #1e3f4f",borderRadius:20,padding:"6px 14px",fontSize:12.5,color:"#8fc4cc"}}>{p}</span>
+          ))}
+        </div>
+      </Panel>
+    </div>
+  );
+}
 
-  <div class="finance-section">
-    <div class="finance-title">🍹 Alavanca 2 — Bar Roots</div>
-    <div class="finance-row"><span>20 hóspedes × R$ 40/dia (média)</span><span>R$ 800/dia</span></div>
-    <div class="finance-row"><span>Público externo (noite de show)</span><span>+R$ 1.500/semana</span></div>
-    <div class="finance-row"><span>Cobertura mínima noite de música</span><span>R$ 20/pessoa</span></div>
-    <div class="finance-total"><span>Receita bar estimada/mês</span><span>~R$ 18.000</span></div>
-  </div>
+function Cronograma({ fases, toggleTarefa }) {
+  return (
+    <div style={{maxWidth:680,margin:"0 auto"}}>
+      {fases.map(f => {
+        const feitas = f.tarefas.filter(t => t.feito).length;
+        const pct = Math.round((feitas / f.tarefas.length) * 100);
+        return (
+          <div key={f.id} style={{background:"#112230",borderRadius:8,border:"1px solid #1e3f4f",borderLeft:`4px solid ${f.cor}`,marginBottom:16,overflow:"hidden"}}>
+            <div style={{padding:"16px 20px 12px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <div>
+                <div style={{fontWeight:700,fontSize:15,color:f.cor,marginBottom:2}}>{f.nome}</div>
+                <div style={{fontFamily:"monospace",fontSize:11,color:"#5a8090"}}>{f.periodo}</div>
+              </div>
+              <div style={{textAlign:"right"}}>
+                <div style={{fontFamily:"monospace",fontSize:18,color:feitas===f.tarefas.length?f.cor:"#3a6070",fontWeight:700}}>{feitas}/{f.tarefas.length}</div>
+                <div style={{fontSize:10,color:"#3a6070"}}>tarefas</div>
+              </div>
+            </div>
+            <div style={{height:3,background:"#0a1e2a",margin:"0 20px 14px"}}>
+              <div style={{height:"100%",width:`${pct}%`,background:f.cor,borderRadius:2,transition:"width .4s ease",boxShadow:`0 0 8px ${f.cor}88`}}/>
+            </div>
+            <div style={{padding:"0 20px 16px",display:"flex",flexDirection:"column",gap:6}}>
+              {f.tarefas.map(t => (
+                <label key={t.id} style={{display:"flex",alignItems:"flex-start",gap:10,cursor:"pointer",padding:"8px 12px",borderRadius:6,background:t.feito?`${f.cor}0f`:"#0e2535",border:`1px solid ${t.feito?f.cor+"33":"#1a3545"}`,transition:"all .15s"}}>
+                  <input type="checkbox" checked={t.feito} onChange={() => toggleTarefa(f.id, t.id)} style={{marginTop:2,accentColor:f.cor,flexShrink:0,width:15,height:15}}/>
+                  <span style={{fontSize:13.5,lineHeight:1.5,color:t.feito?"#5a8090":"#c8dde0",textDecoration:t.feito?"line-through":"none"}}>{t.texto}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
-  <div class="finance-section">
-    <div class="finance-title">🎯 Alavanca 3 — Pacotes Premium</div>
-    <div class="finance-row"><span>Pacote "Surf Week" (7n + 5 aulas)</span><span>R$ 1.200–1.500/pessoa</span></div>
-    <div class="finance-row"><span>Pacote "Roots Weekend" (2n + bar open)</span><span>R$ 380–450/pessoa</span></div>
-    <div class="finance-row"><span>Passeio Crôa do Goré + Xingó</span><span>R$ 120–180/pessoa</span></div>
-    <div class="finance-row"><span>Aluguel prancha/bike por dia</span><span>R$ 50–80/unidade</span></div>
-    <div class="finance-total"><span>Receita atividades estimada/mês</span><span>~R$ 9.000</span></div>
-  </div>
+function LineItems({ titulo, itens, setItens }) {
+  const atualizar = (i, campo, valor) => setItens(itens.map((it, idx) => idx===i?{...it,[campo]:campo==="valor"?Number(valor):valor}:it));
+  const remover = i => setItens(itens.filter((_,idx) => idx!==i));
+  const adicionar = () => setItens([...itens,{label:"Novo item",valor:0}]);
+  const total = itens.reduce((s,it) => s+Number(it.valor||0),0);
+  return (
+    <Panel label={titulo}>
+      {itens.map((it,i) => (
+        <div key={i} style={{display:"flex",gap:8,marginBottom:8,alignItems:"center"}}>
+          <input value={it.label} onChange={e=>atualizar(i,"label",e.target.value)} style={{flex:1,background:"#0e2535",border:"1px solid #1e3f4f",borderRadius:5,padding:"7px 10px",color:"#c8dde0",fontSize:13,fontFamily:"inherit"}}/>
+          <input type="number" value={it.valor} onChange={e=>atualizar(i,"valor",e.target.value)} style={{width:110,background:"#0e2535",border:"1px solid #1e3f4f",borderRadius:5,padding:"7px 10px",color:"#e8b84b",fontSize:13,fontFamily:"monospace",textAlign:"right"}}/>
+          <button onClick={()=>remover(i)} style={{background:"none",border:"none",color:"#e0654f",cursor:"pointer",fontSize:18,lineHeight:1,padding:"0 4px"}}>×</button>
+        </div>
+      ))}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:12}}>
+        <button onClick={adicionar} style={{background:"none",border:"1px dashed #2a5060",borderRadius:5,color:"#5fb8ae",padding:"6px 14px",cursor:"pointer",fontSize:12}}>+ adicionar item</button>
+        <span style={{fontFamily:"monospace",fontSize:14,color:"#e8b84b"}}>Total: <b>{fmt(total)}</b></span>
+      </div>
+    </Panel>
+  );
+}
 
-  <div class="finance-section">
-    <div class="finance-title">📊 Projeção de Crescimento (12 meses)</div>
-    <div class="finance-row"><span>Mês 1–3 (rodagem)</span><span style="color:var(--rock)">R$ 18–25K/mês</span></div>
-    <div class="finance-row"><span>Mês 4–6 (parcerias ativas)</span><span style="color:var(--reggae)">R$ 30–40K/mês</span></div>
-    <div class="finance-row"><span>Mês 7–9 (marca consolidada)</span><span style="color:var(--surf)">R$ 42–52K/mês</span></div>
-    <div class="finance-row"><span>Mês 10–12 (alta temporada)</span><span style="color:var(--green)">R$ 55–75K/mês</span></div>
-    <div class="finance-total"><span>Lucro líquido ano 1 (médio)</span><span>~R$ 22–28K/mês</span></div>
-  </div>
+function Financeiro({ financeiro, setFinanceiro, calc }) {
+  const set = (campo, valor) => setFinanceiro({...financeiro,[campo]:valor});
+  const setOcup = (campo, valor) => setFinanceiro({...financeiro,ocupacao:{...financeiro.ocupacao,[campo]:Number(valor)}});
+  const inp = {background:"#0e2535",border:"1px solid #1e3f4f",borderRadius:5,padding:"7px 10px",color:"#e8b84b",fontSize:14,fontFamily:"monospace",width:"100%",textAlign:"right"};
+  return (
+    <div style={{maxWidth:680,margin:"0 auto"}}>
+      <Panel label="Parâmetros da hospedagem">
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          {[["Nº de camas","camas",financeiro.camas],["Diária seg–qui (R$)","diariaBase",financeiro.diariaBase],["Diária fim de semana (R$)","diariaFimSemana",financeiro.diariaFimSemana],["Bar por cama/dia (R$)","barPorCamaDia",financeiro.barPorCamaDia],["Atividades / mês (R$)","atividadesMes",financeiro.atividadesMes]].map(([label,campo,val]) => (
+            <div key={campo}>
+              <div style={{fontSize:11,color:"#5a8090",marginBottom:5}}>{label}</div>
+              <input type="number" value={val} onChange={e=>set(campo,Number(e.target.value))} style={inp}/>
+            </div>
+          ))}
+        </div>
+      </Panel>
+      <Panel label="Cenários de ocupação (%)">
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
+          {[["pessimista","#e0654f"],["realista","#5fb8ae"],["otimista","#e8b84b"]].map(([campo,cor]) => (
+            <div key={campo}>
+              <div style={{fontSize:11,color:cor,marginBottom:5,textTransform:"capitalize"}}>{campo}</div>
+              <input type="number" value={financeiro.ocupacao[campo]} onChange={e=>setOcup(campo,e.target.value)} style={{...inp,color:cor,border:`1px solid ${cor}44`}}/>
+            </div>
+          ))}
+        </div>
+      </Panel>
+      <LineItems titulo="Investimento inicial" itens={financeiro.investimento} setItens={v=>set("investimento",v)}/>
+      <LineItems titulo="Custos fixos mensais" itens={financeiro.custosFixos} setItens={v=>set("custosFixos",v)}/>
+      <Panel label="Resultado simulado">
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:16}}>
+          {[["Pessimista",calc.pessimista,"#e0654f",financeiro.ocupacao.pessimista],["Realista",calc.realista,"#5fb8ae",financeiro.ocupacao.realista],["Otimista",calc.otimista,"#e8b84b",financeiro.ocupacao.otimista]].map(([nome,c,cor,pct]) => (
+            <div key={nome} style={{background:"#0e2535",border:`1px solid ${cor}33`,borderTop:`3px solid ${cor}`,borderRadius:8,padding:"14px 16px"}}>
+              <div style={{fontSize:11,color:cor,fontFamily:"monospace",marginBottom:8}}>{nome} · {pct}%</div>
+              <div style={{fontFamily:"monospace",fontSize:19,color:"#f3ecdc",fontWeight:600,marginBottom:4}}>{fmt(c.receitaTotal)}</div>
+              <div style={{fontSize:11.5,color:"#5a8090",marginBottom:8}}>/mês total</div>
+              <div style={{fontSize:13,fontWeight:600,color:c.lucro>=0?cor:"#e0654f"}}>{c.lucro>=0?"+":""}{fmt(c.lucro)}</div>
+              <div style={{fontSize:10.5,color:"#3a6070"}}>{c.lucro>=0?"lucro":"prejuízo"}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{background:"#0e2535",borderRadius:6,padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <span style={{fontSize:12.5,color:"#5a8090"}}>Break-even (cenário realista)</span>
+          <span style={{fontFamily:"monospace",fontSize:15,color:"#e8b84b",fontWeight:700}}>{calc.breakEven?`${calc.breakEven} meses`:"não atingido"}</span>
+        </div>
+      </Panel>
+    </div>
+  );
+}
 
-  <div class="finance-section">
-    <div class="finance-title">⚡ Ações de Alto Impacto (Quick Wins)</div>
-    <ul class="idea-list">
-      <li>Ativar o bar desde o dia 1 — é receita imediata sem custo fixo extra</li>
-      <li>Fechar parceria de surf antes da abertura — já abre com pacote vendável</li>
-      <li>Cadastrar no Hostelworld além do Booking — público hostel é diferente</li>
-      <li>TikTok da reforma em tempo real — gera audiência antes de abrir</li>
-      <li>Abrir para eventos externos nas quintas-feiras — ocupa espaço ocioso</li>
-    </ul>
-  </div>
+function Notas({ notas, setNotas }) {
+  return (
+    <div style={{maxWidth:680,margin:"0 auto"}}>
+      <Panel label="Suas anotações">
+        <textarea value={notas} onChange={e=>setNotas(e.target.value)} placeholder="Ideias, contatos, pendências, decisões importantes..." rows={14}
+          style={{width:"100%",background:"#0e2535",border:"1px solid #1e3f4f",borderRadius:6,padding:"14px",color:"#c8dde0",fontSize:14,fontFamily:"'IBM Plex Sans',sans-serif",lineHeight:1.7,resize:"vertical"}}/>
+      </Panel>
+    </div>
+  );
+}
 
-</div>
+function gerarRelatorio(fases, financeiro, notas, calc) {
+  const totalTarefas = fases.reduce((s,f)=>s+f.tarefas.length,0);
+  const feitas = fases.reduce((s,f)=>s+f.tarefas.filter(t=>t.feito).length,0);
+  const progresso = totalTarefas?Math.round((feitas/totalTarefas)*100):0;
+  const now = new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
+  const fasesHTML = fases.map(f=>{
+    const feitasF=f.tarefas.filter(t=>t.feito).length;
+    const tarefasHTML=f.tarefas.map(t=>`<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #1e3f4f;align-items:flex-start"><span style="color:${t.feito?f.cor:"#3a6070"};font-size:16px;line-height:1;flex-shrink:0">${t.feito?"✓":"○"}</span><span style="font-size:13px;color:${t.feito?"#5a8090":"#c8dde0"};text-decoration:${t.feito?"line-through":"none"}">${t.texto}</span></div>`).join("");
+    return `<div style="background:#112230;border:1px solid #1e3f4f;border-left:4px solid ${f.cor};border-radius:8px;padding:20px;margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><div style="font-weight:700;font-size:15px;color:${f.cor}">${f.nome}</div><div style="font-family:monospace;font-size:11px;color:#5a8090">${f.periodo}</div></div><div style="font-family:monospace;font-size:18px;color:${f.cor};font-weight:700">${feitasF}/${f.tarefas.length}</div></div>${tarefasHTML}</div>`;
+  }).join("");
+  const cenariosHTML=[["Pessimista",calc.pessimista,"#e0654f",financeiro.ocupacao.pessimista],["Realista",calc.realista,"#5fb8ae",financeiro.ocupacao.realista],["Otimista",calc.otimista,"#e8b84b",financeiro.ocupacao.otimista]].map(([nome,c,cor,pct])=>`<div style="background:#0e2535;border:1px solid ${cor}33;border-top:3px solid ${cor};border-radius:8px;padding:16px;flex:1"><div style="font-size:11px;color:${cor};font-family:monospace;margin-bottom:8px">${nome} · ${pct}%</div><div style="font-family:monospace;font-size:20px;color:#f3ecdc;font-weight:600;margin-bottom:4px">${fmt(c.receitaTotal)}</div><div style="font-size:11px;color:#5a8090;margin-bottom:10px">/mês</div><div style="font-size:14px;font-weight:700;color:${c.lucro>=0?cor:"#e0654f"}">${c.lucro>=0?"+":""}${fmt(c.lucro)}</div><div style="font-size:10px;color:#3a6070">${c.lucro>=0?"lucro":"prejuízo"}</div></div>`).join("");
+  const notasHTML=notas?`<div style="background:#112230;border:1px solid #1e3f4f;border-radius:8px;padding:20px;margin-top:20px"><div style="font-family:monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5fb8ae;margin-bottom:12px">Notas</div><pre style="font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:#c8dde0;white-space:pre-wrap;line-height:1.7;margin:0">${notas}</pre></div>`:"";
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hostel Roots — Relatório</title><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet"><style>*{box-sizing:border-box}body{margin:0;padding:32px 20px 60px;background:#0b1e2a;color:#c8dde0;font-family:'IBM Plex Sans',sans-serif}</style></head><body><div style="max-width:720px;margin:0 auto"><div style="text-align:center;margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid #1e3f4f"><div style="font-family:monospace;font-size:11px;letter-spacing:.2em;color:#5fb8ae;margin-bottom:8px">ARACAJU · SE · ${now}</div><div style="font-size:38px;font-weight:700;color:#e8b84b;letter-spacing:-.01em;margin-bottom:4px">HOSTEL ROOTS</div><div style="font-size:13px;color:#5a8090;letter-spacing:.12em">reggae · rock · surf</div><div style="margin-top:20px"><div style="font-size:12px;color:#5a8090;margin-bottom:6px">Progresso geral</div><div style="height:8px;background:#0e2535;border-radius:4px;overflow:hidden;max-width:400px;margin:0 auto"><div style="height:100%;width:${progresso}%;background:linear-gradient(90deg,#1a6fa8,#5fb8ae,#e8b84b);border-radius:4px"></div></div><div style="font-family:monospace;font-size:20px;color:#e8b84b;margin-top:8px;font-weight:600">${progresso}%</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px">${[["Investimento total",fmt(calc.totalInvestimento),"#e8b84b"],["Custo fixo / mês",fmt(calc.totalCustoFixo),"#e0654f"],["Receita realista / mês",fmt(calc.realista.receitaTotal),"#5fb8ae"],["Break-even",calc.breakEven?`${calc.breakEven} meses`:"—","#c8a84b"]].map(([l,v,c])=>`<div style="background:#112230;border:1px solid #1e3f4f;border-top:3px solid ${c};border-radius:8px;padding:16px 18px"><div style="font-size:10px;color:#5a8090;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">${l}</div><div style="font-family:monospace;font-size:20px;color:${c};font-weight:600">${v}</div></div>`).join("")}</div><div style="font-family:monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5fb8ae;margin-bottom:14px">Cenários financeiros</div><div style="display:flex;gap:12px;margin-bottom:28px">${cenariosHTML}</div><div style="font-family:monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#5fb8ae;margin-bottom:14px">Cronograma</div>${fasesHTML}${notasHTML}<div style="text-align:center;margin-top:40px;font-size:11px;color:#2a5060;font-family:monospace">Gerado pelo painel Hostel Roots · ${now}</div></div></body></html>`;
+}
 
-<script>
-  // ── Atribui IDs estáveis a cada checkbox ──
-  document.querySelectorAll('.task input[type="checkbox"]').forEach((cb, i) => {
-    cb.dataset.id = 'task-' + i;
-  });
+function BotaoExportar({ fases, financeiro, notas, calc }) {
+  const [hover, setHover] = useState(false);
+  const exportar = () => {
+    const html = gerarRelatorio(fases, financeiro, notas, calc);
+    const win = window.open("","_blank");
+    if (win) { win.document.write(html); win.document.close(); }
+  };
+  return (
+    <button onClick={exportar} title="Exportar relatório" onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
+      style={{position:"fixed",bottom:24,right:20,background:"linear-gradient(135deg,#1a6fa8,#5fb8ae)",border:"none",borderRadius:50,width:52,height:52,color:"#fff",cursor:"pointer",fontSize:20,boxShadow:hover?"0 6px 28px #5fb8ae99":"0 4px 20px #1a6fa888",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,transform:hover?"scale(1.1)":"scale(1)",transition:"all .15s"}}>
+      ↗
+    </button>
+  );
+}
 
-  // ── Persistência via localStorage ──
-  function saveProgress() {
-    const state = {};
-    document.querySelectorAll('.task input[type="checkbox"]').forEach(cb => {
-      state[cb.dataset.id] = cb.checked;
-    });
-    localStorage.setItem('hostelroots_tasks', JSON.stringify(state));
-  }
+function App() {
+  const [aba, setAba] = useState("geral");
+  const [fases, setFases] = useState(FASES_INICIAIS);
+  const [financeiro, setFinanceiro] = useState(FINANCEIRO_INICIAL);
+  const [notas, setNotas] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
-  function loadProgress() {
-    const saved = localStorage.getItem('hostelroots_tasks');
-    if (!saved) return;
-    const state = JSON.parse(saved);
-    document.querySelectorAll('.task input[type="checkbox"]').forEach(cb => {
-      if (state[cb.dataset.id]) {
-        cb.checked = true;
-        cb.closest('.task').querySelector('.task-text').classList.add('done');
+  useEffect(() => {
+    try {
+      const saved = storage.get("hostel-estado");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.fases) setFases(parsed.fases);
+        if (parsed.financeiro) setFinanceiro(parsed.financeiro);
+        if (parsed.notas !== undefined) setNotas(parsed.notas);
       }
-    });
-  }
+    } catch(e) {}
+    setLoaded(true);
+  }, []);
 
-  function updateProgress() {
-    const checkboxes = document.querySelectorAll('.task input[type="checkbox"]');
-    let done = 0;
-    checkboxes.forEach(cb => {
-      const label = cb.closest('.task').querySelector('.task-text');
-      if (cb.checked) { label.classList.add('done'); done++; }
-      else { label.classList.remove('done'); }
-    });
-    const pct = Math.round((done / checkboxes.length) * 100);
-    document.getElementById('globalProgress').style.width = pct + '%';
-    document.getElementById('progressPct').textContent = pct + '%';
-    saveProgress();
-  }
+  const salvar = (next) => storage.set("hostel-estado", JSON.stringify(next));
+  const atualizarFases = next => { setFases(next); salvar({fases:next,financeiro,notas}); };
+  const atualizarFinanceiro = next => { setFinanceiro(next); salvar({fases,financeiro:next,notas}); };
+  const atualizarNotas = next => { setNotas(next); salvar({fases,financeiro,notas:next}); };
+  const toggleTarefa = (faseId, tarefaId) => {
+    const next = fases.map(f => f.id!==faseId?f:{...f,tarefas:f.tarefas.map(t=>t.id!==tarefaId?t:{...t,feito:!t.feito})});
+    atualizarFases(next);
+  };
 
-  function showTab(id) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    event.target.classList.add('active');
-  }
+  const totalTarefas = fases.reduce((s,f)=>s+f.tarefas.length,0);
+  const feitas = fases.reduce((s,f)=>s+f.tarefas.filter(t=>t.feito).length,0);
+  const progresso = totalTarefas?Math.round((feitas/totalTarefas)*100):0;
+  const calc = useMemo(()=>calcular(financeiro),[financeiro]);
 
-  function togglePhase(header) {
-    header.nextElementSibling.classList.toggle('open');
-  }
+  if (!loaded) return null;
 
-  // ── Init ──
-  loadProgress();
-  updateProgress();
-  document.querySelector('.phase-body').classList.add('open');
+  return (
+    <div style={{minHeight:"100vh",background:"radial-gradient(ellipse at 50% -10%,#163a48 0%,#0b1e2a 65%)",color:"#c8dde0",padding:"28px 16px 80px",fontFamily:"'IBM Plex Sans',sans-serif"}}>
+      <div style={{textAlign:"center",marginBottom:24}}>
+        <div style={{fontFamily:"monospace",fontSize:10,letterSpacing:".22em",color:"#5fb8ae",marginBottom:10,textTransform:"uppercase"}}>10°54'S 37°04'O · Aracaju, Sergipe</div>
+        <div style={{fontSize:38,fontWeight:800,color:"#e8b84b",letterSpacing:"-.01em",lineHeight:1,marginBottom:4}}>HOSTEL ROOTS</div>
+        <div style={{fontSize:13,color:"#5a8090",letterSpacing:".18em",textTransform:"uppercase"}}>reggae · rock · surf</div>
+        <WaveDivider/>
+      </div>
+      <TideBar pct={progresso}/>
+      <Nav aba={aba} setAba={setAba}/>
+      {aba==="geral" && <VisaoGeral calc={calc}/>}
+      {aba==="cronograma" && <Cronograma fases={fases} toggleTarefa={toggleTarefa}/>}
+      {aba==="financeiro" && <Financeiro financeiro={financeiro} setFinanceiro={atualizarFinanceiro} calc={calc}/>}
+      {aba==="notas" && <Notas notas={notas} setNotas={atualizarNotas}/>}
+      <BotaoExportar fases={fases} financeiro={financeiro} notas={notas} calc={calc}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
