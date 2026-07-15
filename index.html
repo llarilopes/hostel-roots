@@ -245,27 +245,6 @@
   </div>
 
   <div class="fin-section">
-    <div class="fin-title">Investimento Inicial</div>
-    <div id="invest-list"></div>
-    <button class="fin-add" onclick="addItem('invest')">+ adicionar item</button>
-    <div class="fin-total"><span>Total Estimado</span><span id="invest-total">—</span></div>
-  </div>
-
-  <div class="fin-section">
-    <div class="fin-title">Custos Fixos Mensais</div>
-    <div id="fixo-list"></div>
-    <button class="fin-add" onclick="addItem('fixo')">+ adicionar item</button>
-    <div class="fin-total"><span>Total Mensal</span><span id="fixo-total">—</span></div>
-  </div>
-
-  <div class="fin-section">
-    <div class="fin-title">Receitas Extras / Mês (editáveis)</div>
-    <div id="receita-list"></div>
-    <button class="fin-add" onclick="addItem('receita')">+ adicionar fonte de receita</button>
-    <div class="fin-total"><span>Total Receitas Extras</span><span id="receita-total">—</span></div>
-  </div>
-
-  <div class="fin-section">
     <div class="fin-title">Cenários de Receita Total</div>
     <div class="scenario-row">
       <div class="scenario">
@@ -289,6 +268,27 @@
     </div>
     <div class="finance-row"><span>Lucro líquido (realista)</span><span id="lucro-real" style="color:var(--green)">—</span></div>
     <div class="finance-row"><span>Break-even estimado</span><span id="be-calc">—</span></div>
+  </div>
+
+  <div class="fin-section">
+    <div class="fin-title">Investimento Inicial</div>
+    <div id="invest-list"></div>
+    <button class="fin-add" onclick="addItem('invest')">+ adicionar item</button>
+    <div class="fin-total"><span>Total Estimado</span><span id="invest-total">—</span></div>
+  </div>
+
+  <div class="fin-section">
+    <div class="fin-title">Custos Fixos Mensais</div>
+    <div id="fixo-list"></div>
+    <button class="fin-add" onclick="addItem('fixo')">+ adicionar item</button>
+    <div class="fin-total"><span>Total Mensal</span><span id="fixo-total">—</span></div>
+  </div>
+
+  <div class="fin-section">
+    <div class="fin-title">Receitas Extras / Mês (editáveis)</div>
+    <div id="receita-list"></div>
+    <button class="fin-add" onclick="addItem('receita')">+ adicionar fonte de receita</button>
+    <div class="fin-total"><span>Total Receitas Extras</span><span id="receita-total">—</span></div>
   </div>
 </div>
 
@@ -638,7 +638,9 @@ function exportarPDF() {
   const totalInvest = state.invest.reduce((s, i) => s + Number(i.valor || 0), 0);
   const totalFixo = state.fixo.reduce((s, i) => s + Number(i.valor || 0), 0);
   const p = getParams();
+  const rPess = calcCenario(p, p.ocPess);
   const rReal = calcCenario(p, p.ocReal);
+  const rOtim = calcCenario(p, p.ocOtim);
   const lucroReal = rReal - totalFixo;
   const breakEven = lucroReal > 0 ? Math.ceil(totalInvest / lucroReal) : null;
 
@@ -700,14 +702,48 @@ function exportarPDF() {
   <div class="kpi g"><div class="kpi-l">Break-even</div><div class="kpi-v">${breakEven ? breakEven + ' m' : '—'}</div></div>
 </div>
 
+<h2>Projeção de Receita — Cenários</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+  <div style="background:#fff3cd;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #C0392B">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Pessimista · ${p.ocPess}%</div>
+    <div style="font-size:22px;font-weight:700;color:#C0392B">${fmtK(rPess)}</div>
+    <div style="font-size:11px;color:#888">/mês</div>
+  </div>
+  <div style="background:#fff8e8;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #D4A017">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Realista · ${p.ocReal}%</div>
+    <div style="font-size:22px;font-weight:700;color:#D4A017">${fmtK(rReal)}</div>
+    <div style="font-size:11px;color:#888">/mês</div>
+  </div>
+  <div style="background:#eafaf1;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #27AE60">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Otimista · ${p.ocOtim}%</div>
+    <div style="font-size:22px;font-weight:700;color:#27AE60">${fmtK(rOtim)}</div>
+    <div style="font-size:11px;color:#888">/mês</div>
+  </div>
+</div>
+<table><tbody>
+  <tr><td>Lucro líquido mensal (cenário realista)</td><td style="text-align:right;font-weight:700;color:${lucroReal>=0?'#27AE60':'#C0392B'}">${lucroReal>=0?'+':''}${fmt(lucroReal)}/mês</td></tr>
+  <tr><td>Custo fixo mensal</td><td style="text-align:right;font-weight:600">${fmt(totalFixo)}</td></tr>
+  <tr><td>Break-even estimado (cenário realista)</td><td style="text-align:right;font-weight:700;color:#D4A017">${breakEven ? breakEven + ' meses' : 'não atingido'}</td></tr>
+  <tr><td>Diária média ponderada (seg–dom)</td><td style="text-align:right;font-weight:600">R$ ${((p.diBase*5+p.diFds*2)/7).toFixed(0)}</td></tr>
+</tbody></table>
+
+<h2>Parâmetros Utilizados na Simulação</h2>
+<table><tbody>
+  <tr><td>Número de camas</td><td style="text-align:right;font-weight:600">${p.camas}</td></tr>
+  <tr><td>Diária seg–qui</td><td style="text-align:right;font-weight:600">${fmt(p.diBase)}</td></tr>
+  <tr><td>Diária fim de semana</td><td style="text-align:right;font-weight:600">${fmt(p.diFds)}</td></tr>
+  <tr><td>Bar por cama/dia (média)</td><td style="text-align:right;font-weight:600">${fmt(p.bar)}</td></tr>
+  <tr><td>Ocupação pessimista / realista / otimista</td><td style="text-align:right;font-weight:600">${p.ocPess}% / ${p.ocReal}% / ${p.ocOtim}%</td></tr>
+</tbody></table>
+
+<h2>Receitas Extras / Mês</h2>
+<table><tbody>${receitaHTML}<tr class="total-row"><td>Total extras</td><td style="text-align:right">${fmt(state.receita.reduce((s,i)=>s+Number(i.valor||0),0))}</td></tr></tbody></table>
+
 <h2>Investimento Inicial</h2>
 <table><tbody>${investHTML}<tr class="total-row"><td>Total</td><td style="text-align:right">${fmt(totalInvest)}</td></tr></tbody></table>
 
 <h2>Custos Fixos Mensais</h2>
 <table><tbody>${fixoHTML}<tr class="total-row"><td>Total</td><td style="text-align:right">${fmt(totalFixo)}</td></tr></tbody></table>
-
-<h2>Receitas Extras / Mês</h2>
-<table><tbody>${receitaHTML}<tr class="total-row"><td>Total extras</td><td style="text-align:right">${fmt(state.receita.reduce((s,i)=>s+Number(i.valor||0),0))}</td></tr></tbody></table>
 
 <h2>Cronograma</h2>
 ${tarefasHTML}
