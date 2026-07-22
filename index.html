@@ -290,6 +290,73 @@
     <button class="fin-add" onclick="addItem('receita')">+ adicionar fonte de receita</button>
     <div class="fin-total"><span>Total Receitas Extras</span><span id="receita-total">—</span></div>
   </div>
+
+  <!-- ENERGIA SOLAR — INVESTIMENTO FUTURO -->
+  <div class="fin-section" style="margin-top:28px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600;">☀️ Energia Solar</div>
+      <span style="font-size:10px;padding:2px 10px;border-radius:20px;background:#1a2d1a;color:var(--green);font-weight:600;letter-spacing:0.5px;">INVESTIMENTO FUTURO</span>
+    </div>
+    <div style="background:#1a2000;border:1px dashed #4a6741;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">
+        Não compõe o investimento inicial nem o break-even de lançamento. Planejado para após a estabilização operacional (~6–12 meses de funcionamento).
+      </div>
+    </div>
+
+    <div class="param-grid" style="margin-bottom:12px;">
+      <div class="param-item">
+        <label>Custo do kit solar (R$)</label>
+        <input type="number" id="sol-kit" value="22000" oninput="calcSolar()">
+      </div>
+      <div class="param-item">
+        <label>Mão de obra instalação (R$)</label>
+        <input type="number" id="sol-mdo" value="3000" oninput="calcSolar()">
+      </div>
+      <div class="param-item">
+        <label>Consumo médio mensal (kWh)</label>
+        <input type="number" id="sol-kwh" value="1000" oninput="calcSolar()">
+      </div>
+      <div class="param-item">
+        <label>Tarifa Energisa/SE (R$/kWh)</label>
+        <input type="number" id="sol-tarifa" value="0.85" step="0.01" oninput="calcSolar()">
+      </div>
+      <div class="param-item">
+        <label>Cobertura solar estimada (%)</label>
+        <input type="number" id="sol-cob" value="85" oninput="calcSolar()">
+      </div>
+    </div>
+
+    <div class="scenario-row" style="margin-bottom:12px;">
+      <div class="scenario" style="border-top:2px solid var(--green);">
+        <div class="scenario-label">Investimento Total</div>
+        <div class="scenario-value" id="sol-total" style="color:var(--sand);font-size:18px;">—</div>
+        <div class="scenario-occ">kit + instalação</div>
+      </div>
+      <div class="scenario" style="border-top:2px solid var(--surf);">
+        <div class="scenario-label">Economia/Mês</div>
+        <div class="scenario-value" id="sol-economia" style="color:var(--surf);font-size:18px;">—</div>
+        <div class="scenario-occ">redução na conta</div>
+      </div>
+      <div class="scenario" style="border-top:2px solid var(--reggae);">
+        <div class="scenario-label">Payback</div>
+        <div class="scenario-value" id="sol-payback" style="color:var(--reggae);font-size:18px;">—</div>
+        <div class="scenario-occ">meses até retorno</div>
+      </div>
+    </div>
+
+    <div class="finance-row">
+      <span>Economia anual projetada</span>
+      <span id="sol-anual" style="color:var(--green);">—</span>
+    </div>
+    <div class="finance-row">
+      <span>Conta de energia após solar</span>
+      <span id="sol-nova-conta" style="color:var(--sand);">—</span>
+    </div>
+    <div class="finance-row" style="margin-bottom:0;">
+      <span>Período recomendado para instalar</span>
+      <span style="color:var(--muted);">6–12 meses após abertura</span>
+    </div>
+  </div>
 </div>
 
 <!-- ESTRATÉGIAS -->
@@ -758,6 +825,30 @@ ${notasHTML}
   setTimeout(() => { win.print(); }, 600);
 }
 
+// ─── SOLAR ───
+function calcSolar() {
+  const kit     = Number(document.getElementById('sol-kit')?.value || 22000);
+  const mdo     = Number(document.getElementById('sol-mdo')?.value || 3000);
+  const kwh     = Number(document.getElementById('sol-kwh')?.value || 1000);
+  const tarifa  = Number(document.getElementById('sol-tarifa')?.value || 0.85);
+  const cob     = Number(document.getElementById('sol-cob')?.value || 85) / 100;
+
+  const total     = kit + mdo;
+  const economia  = kwh * tarifa * cob;
+  const payback   = economia > 0 ? Math.ceil(total / economia) : 0;
+  const anual     = economia * 12;
+  const contaAtual = kwh * tarifa;
+  const novaConta  = contaAtual - economia;
+
+  const f = v => 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+
+  document.getElementById('sol-total').textContent    = f(total);
+  document.getElementById('sol-economia').textContent = f(economia);
+  document.getElementById('sol-payback').textContent  = payback + ' m';
+  document.getElementById('sol-anual').textContent    = f(anual);
+  document.getElementById('sol-nova-conta').textContent = f(Math.max(0, novaConta)) + '/mês';
+}
+
 // ─── INIT ───
 loadState();
 loadCheckboxes();
@@ -768,6 +859,7 @@ renderList('receita');
 notasEl.value = state.notas || '';
 document.getElementById('p1').classList.add('open');
 updateTotals();
+calcSolar();
 </script>
 </body>
 </html>
