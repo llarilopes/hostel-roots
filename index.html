@@ -20,6 +20,50 @@
   header h1 { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 3px; color: var(--sand); }
   header p { color: var(--muted); font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
 
+  
+  .req-table { width:100%; border-collapse:collapse; }
+  .req-table td { padding:8px 6px; border-bottom:1px solid #2a2a2a; font-size:13px; }
+  .req-table td:first-child { color: var(--muted); }
+  .req-table td:last-child { text-align:right; font-weight:600; }
+  .imovel-card { background: var(--mid); border-radius:10px; padding:16px; margin-bottom:14px; border-left:4px solid #555; }
+  .imovel-card.ok   { border-left-color:#27AE60; }
+  .imovel-card.warn { border-left-color:#D4A017; }
+  .imovel-card.bad  { border-left-color:#C0392B; }
+  .imovel-head { display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  .imovel-head input.nome { flex:1; background:#111; border:1px solid #333; color:var(--sand); padding:8px 10px; border-radius:6px; font-size:14px; font-weight:600; }
+  .imovel-badge { font-size:10px; text-transform:uppercase; letter-spacing:1px; padding:4px 9px; border-radius:20px; font-weight:700; white-space:nowrap; }
+  .badge-ok   { background:rgba(39,174,96,.15); color:#27AE60; }
+  .badge-warn { background:rgba(212,160,23,.15); color:#D4A017; }
+  .badge-bad  { background:rgba(192,57,43,.15); color:#C0392B; }
+  .imovel-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+  .imovel-field label { display:block; font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:4px; }
+  .imovel-field input, .imovel-field select, .imovel-field textarea {
+    width:100%; background:#111; border:1px solid #333; color:var(--text);
+    padding:7px 9px; border-radius:6px; font-size:13px; font-family:inherit;
+  }
+  .imovel-field.full { grid-column:1/-1; }
+  .imovel-field textarea { resize:vertical; min-height:56px; }
+  .imovel-checks { display:flex; flex-wrap:wrap; gap:14px; margin-top:12px; padding-top:12px; border-top:1px solid #2a2a2a; }
+  .imovel-checks label { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); cursor:pointer; }
+  .imovel-actions { margin-top:12px; text-align:right; }
+  .imovel-actions button { background:transparent; border:1px solid #C0392B; color:#C0392B; padding:5px 12px; border-radius:6px; font-size:11px; cursor:pointer; }
+
+  #pdfPreview { position:fixed; inset:0; z-index:9999; background:#fff; overflow-y:auto; }
+  #pdfPreview .pdf-doc { max-width:720px; margin:0 auto; padding:24px 20px 60px; font-family:Arial,sans-serif; color:#222; }
+  #pdfPreview .pdf-bar { position:sticky; top:0; z-index:2; display:flex; align-items:center; justify-content:space-between;
+    gap:10px; padding:10px 14px; background:#1a1a1a; border-bottom:2px solid #D4A017; }
+  #pdfPreview .pdf-hint { font-size:11px; color:#aaa; flex:1; text-align:center; }
+  #pdfPreview .pdf-close, #pdfPreview .pdf-print { border:none; border-radius:6px; padding:9px 16px;
+    font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; font-family:inherit; }
+  #pdfPreview .pdf-close { background:transparent; color:#aaa; border:1px solid #444; }
+  #pdfPreview .pdf-print { background:#D4A017; color:#1a1a1a; }
+  @media print {
+    body.printing > *:not(#pdfPreview) { display:none !important; }
+    #pdfPreview { position:static; overflow:visible; }
+    #pdfPreview .pdf-bar { display:none !important; }
+    #pdfPreview .pdf-doc { max-width:none; padding:0; }
+  }
+  @media (max-width:520px) { #pdfPreview .pdf-hint { display:none; } }
   .tabs { display: flex; gap: 0; background: var(--mid); border-bottom: 1px solid #333; overflow-x: auto; }
   .tab { padding: 12px 20px; cursor: pointer; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); border-bottom: 3px solid transparent; white-space: nowrap; transition: all 0.2s; }
   .tab.active { color: var(--sand); border-bottom-color: var(--reggae); }
@@ -149,6 +193,7 @@
   <div class="tab" data-tab="cronograma">Cronograma</div>
   <div class="tab" data-tab="financeiro">Financeiro</div>
   <div class="tab" data-tab="estrategias">💡 Estratégias</div>
+  <div class="tab" data-tab="imoveis">🏠 Imóveis</div>
   <div class="tab" data-tab="conceito">Conceito</div>
   <div class="tab" data-tab="notas">Notas</div>
 </div>
@@ -254,7 +299,7 @@
   <div class="fin-section">
     <div class="fin-title">Parâmetros</div>
     <div class="param-grid">
-      <div class="param-item"><label>Nº de camas</label><input type="number" id="p-camas" value="20"></div>
+      <div class="param-item"><label>Nº de camas</label><input type="number" id="p-camas" value="24"></div>
       <div class="param-item"><label>Diária seg–qui (R$)</label><input type="number" id="p-diaria-base" value="75"></div>
       <div class="param-item"><label>Diária fim de semana (R$)</label><input type="number" id="p-diaria-fds" value="120"></div>
       <div class="param-item"><label>Bar por cama/dia (R$)</label><input type="number" id="p-bar" value="40"></div>
@@ -471,6 +516,31 @@
 </div>
 
 <!-- CONCEITO -->
+<div class="panel" id="imoveis">
+  <div class="card">
+    <div class="card-title">🏠 Checklist de visita — comparativo de imóveis</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px">
+      Cadastre cada casa visitada. O semáforo indica se o imóvel comporta a configuração alvo
+      (<b>24 camas</b> · 4 quartos · mínimo 4 banheiros · pé-direito ≥ 2,60 m).
+    </p>
+    <button class="add-btn" onclick="addImovel()">+ Adicionar imóvel</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Requisitos mínimos</div>
+    <table class="req-table">
+      <tr><td>Área de dormitórios</td><td>≥ 66 m² (4 m²/hóspede)</td></tr>
+      <tr><td>Área total da casa</td><td>≥ 180 m²</td></tr>
+      <tr><td>Quartos</td><td>4</td></tr>
+      <tr><td>Banheiros</td><td>≥ 4 (1 para cada 6 hóspedes)</td></tr>
+      <tr><td>Pé-direito</td><td>≥ 2,60 m (para beliche)</td></tr>
+      <tr><td>Autorização comercial</td><td>Obrigatória no contrato</td></tr>
+    </table>
+  </div>
+
+  <div id="imoveis-list"></div>
+</div>
+
 <div class="panel" id="conceito">
   <div class="themes">
     <div class="theme-card reggae">
@@ -538,7 +608,10 @@
       <div class="pdf-check-item"><input type="checkbox" id="pdf-invest" checked><label for="pdf-invest">Investimento Inicial</label></div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-fixo" checked><label for="pdf-fixo">Custos Fixos Mensais</label></div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-receitas" checked><label for="pdf-receitas">Receitas Extras / Mês</label></div>
-      <div class="pdf-check-item"><input type="checkbox" id="pdf-solar" checked><label for="pdf-solar">☀️ Energia Solar (investimento futuro)</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-solar" checked><label for="pdf-solar">☀️ Energia Solar (payback e recomendação)</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-quartos" checked><label for="pdf-quartos">🛏 Configuração dos quartos (24 camas)</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-imoveis" checked><label for="pdf-imoveis">🏠 Imóveis — comparativo</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-imoveis-ficha"><label for="pdf-imoveis-ficha">🏠 Imóveis — ficha individual (1 por página)</label></div>
 
       <div class="modal-section-label">📅 Cronograma</div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-crono" checked><label for="pdf-crono">Cronograma completo com tarefas</label></div>
@@ -559,7 +632,9 @@
 // ─── DADOS PADRÃO ───
 const DEFAULT_INVEST = [
   {label:"Reforma e decoração temática", valor:27500},
-  {label:"Beliches e colchões (20 camas)", valor:11500},
+  {label:"Beliches e colchões (22 camas dorm.)", valor:13000},
+  {label:"Cama casal + mobília privativo", valor:2500},
+  {label:"Lockers individuais (24 un.)", valor:6000},
   {label:"Equipamentos (ar, Wi-Fi, TV)", valor:10000},
   {label:"Registro, alvará e CNPJ", valor:4000},
   {label:"Marketing inicial + fotos + site", valor:4500},
@@ -573,6 +648,10 @@ const DEFAULT_FIXO = [
   {label:"Funcionários (1–2 pessoas)", valor:4000},
   {label:"Plataformas (~15% da receita)", valor:3750},
   {label:"Manutenção e limpeza", valor:800},
+  {label:"Piscina — produtos e limpeza", valor:600},
+  {label:"Piscina — energia da bomba", valor:130},
+  {label:"Piscina — seguro adicional", valor:80},
+  {label:"Piscina — reserva p/ reparos", valor:100},
 ];
 const DEFAULT_RECEITA = [
   {label:"Bar temático (estimativa mensal)", valor:18000},
@@ -581,23 +660,24 @@ const DEFAULT_RECEITA = [
   {label:"Noite de show (entrada/consumação)", valor:2000},
   {label:"Café da manhã regional", valor:1500},
   {label:"Passeios e experiências locais", valor:1500},
+  {label:"Day use piscina (entrada + consumo)", valor:3000},
 ];
 
 // ─── ESTADO ───
-let state = { invest: [], fixo: [], receita: [], notas: "" };
+let state = { invest: [], fixo: [], receita: [], notas: "", imoveis: [] };
 
 function loadState() {
   try {
-    const s = localStorage.getItem('hostelroots_v3');
-    if (s) state = JSON.parse(s);
-    else state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "" };
+    const s = localStorage.getItem('hostelroots_v4');
+    if (s) { state = JSON.parse(s); if(!state.imoveis) state.imoveis = []; }
+    else state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [] };
   } catch(e) {
-    state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "" };
+    state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [] };
   }
 }
 
 function saveState() {
-  localStorage.setItem('hostelroots_v3', JSON.stringify(state));
+  localStorage.setItem('hostelroots_v4', JSON.stringify(state));
 }
 
 // ─── RENDERIZAR LISTAS EDITÁVEIS ───
@@ -645,7 +725,7 @@ function fmtK(n) {
 
 function getParams() {
   return {
-    camas: Number(document.getElementById('p-camas').value) || 20,
+    camas: Number(document.getElementById('p-camas').value) || 24,
     diBase: Number(document.getElementById('p-diaria-base').value) || 75,
     diFds: Number(document.getElementById('p-diaria-fds').value) || 120,
     bar: Number(document.getElementById('p-bar').value) || 40,
@@ -763,6 +843,11 @@ document.querySelectorAll('.param-item input').forEach(inp => {
 function abrirModal() {
   document.getElementById('pdfModal').classList.add('open');
 }
+function fecharPreview() {
+  const o = document.getElementById('pdfPreview');
+  if (o) o.remove();
+  document.body.classList.remove('printing');
+}
 function fecharModal() {
   document.getElementById('pdfModal').classList.remove('open');
 }
@@ -856,9 +941,117 @@ function exportarPDF() {
   <tr><td>Economia mensal estimada</td><td style="text-align:right;font-weight:600;color:#27AE60">${fmt(eco)}/mês</td></tr>
   <tr><td>Economia anual</td><td style="text-align:right;font-weight:600;color:#27AE60">${fmt(eco*12)}/ano</td></tr>
   <tr><td>Payback estimado</td><td style="text-align:right;font-weight:700;color:#D4A017">${pb} meses</td></tr>
-  <tr><td>Período recomendado para instalar</td><td style="text-align:right;color:#888">6–12 meses após abertura</td></tr>
-</tbody></table>`;
+  <tr><td>Vida útil do sistema</td><td style="text-align:right;color:#888">20+ anos</td></tr>
+</tbody></table>
+<h3>Comparativo mensal</h3>
+<table>
+  <thead><tr style="background:#f5f5f5">
+    <td style="font-size:10px;text-transform:uppercase;color:#888"><b></b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:right"><b>Sem solar</b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:right"><b>Com solar</b></td>
+  </tr></thead>
+  <tbody>
+  <tr><td>Conta de luz</td><td style="text-align:right">${fmt(kwh*tarifa)}</td><td style="text-align:right">${fmt(kwh*tarifa - eco)}</td></tr>
+  <tr><td>Parcela do financiamento</td><td style="text-align:right">R$ 0</td><td style="text-align:right">${fmt(total/48)}</td></tr>
+  <tr class="total-row"><td>Gasto mensal</td><td style="text-align:right">${fmt(kwh*tarifa)}</td><td style="text-align:right">${fmt(kwh*tarifa - eco + total/48)}</td></tr>
+  </tbody>
+</table>
+<h3>Como acontece ao longo do tempo</h3>
+<table><tbody>
+  <tr><td><b>Mês 0 — Instalação</b><br><span style="font-size:11px;color:#888">Com financiamento bancário não é preciso ter o valor em caixa.</span></td><td style="text-align:right;font-weight:600">${fmt(total)}</td></tr>
+  <tr><td><b>Meses 1 a 48 — Parcela coberta pela economia</b><br><span style="font-size:11px;color:#888">A economia na conta de luz cobre a parcela do financiamento.</span></td><td style="text-align:right;font-weight:600;color:#27AE60">${fmt(eco - total/48)}/mês</td></tr>
+  <tr><td><b>A partir do mês 49 — Payback atingido</b><br><span style="font-size:11px;color:#888">Financiamento quitado. A economia vira resultado operacional.</span></td><td style="text-align:right;font-weight:700;color:#27AE60">+${fmt(eco)}/mês</td></tr>
+</tbody></table>
+<h3>Formas de pagamento</h3>
+<table><tbody>
+  <tr><td><b>Financiamento bancário (48–60 meses)</b> — recomendado<br><span style="font-size:11px;color:#888">O banco paga a instalação. Parcelas cobertas pela própria economia. Risco baixo, sem caixa inicial.</span></td></tr>
+  <tr><td><b>Capital próprio</b><br><span style="font-size:11px;color:#888">Payback mais rápido, mas exige disponibilidade de caixa imediata.</span></td></tr>
+  <tr><td><b>Leasing / assinatura solar</b><br><span style="font-size:11px;color:#888">Sem investimento inicial, mensalidade menor que a concessionária, mas o sistema não fica sendo seu.</span></td></tr>
+</tbody></table>
+<h3>Recomendação para o Hostel Roots</h3>
+<p style="font-size:12px;line-height:1.7;color:#333;background:#fff8e8;padding:12px;border-radius:6px;border-left:3px solid #D4A017">
+<b>Instalar na Fase 2 — após ~6 meses operando.</b> Aguardar os primeiros meses de operação garante
+faturamento real para bancar a parcela com tranquilidade e permite negociar melhores condições com o
+banco, apresentando receita comprovada. Aracaju tem uma das maiores incidências solares do Brasil, o que
+torna o retorno ainda mais rápido quando chegar o momento.
+</p>`;
   })() : '';
+
+  const blocoQuartos = sel('pdf-quartos') ? `
+<h2>Configuração dos Quartos — 24 camas</h2>
+<table><tbody>
+  <tr><td><b>Ala Reggae</b> — 4 beliches</td><td style="text-align:right;font-weight:600">8 camas · ~20 m²</td></tr>
+  <tr><td><b>Ala Rock</b> — 4 beliches</td><td style="text-align:right;font-weight:600">8 camas · ~20 m²</td></tr>
+  <tr><td><b>Ala Surf</b> — 3 beliches</td><td style="text-align:right;font-weight:600">6 camas · ~16 m²</td></tr>
+  <tr><td><b>Privativo casal</b> — 1 cama de casal</td><td style="text-align:right;font-weight:600">2 camas · ~10 m²</td></tr>
+  <tr class="total-row"><td>Total</td><td style="text-align:right">24 camas · ~66 m²</td></tr>
+</tbody></table>
+<h3>Requisitos mínimos do imóvel</h3>
+<table><tbody>
+  <tr><td>Área total da casa</td><td style="text-align:right">≥ 180 m²</td></tr>
+  <tr><td>Banheiros</td><td style="text-align:right">≥ 4 (1 para cada 6 hóspedes)</td></tr>
+  <tr><td>Pé-direito</td><td style="text-align:right">≥ 2,60 m</td></tr>
+  <tr><td>Lockers individuais</td><td style="text-align:right">24 unidades</td></tr>
+  <tr><td>Autorização comercial</td><td style="text-align:right">Obrigatória no contrato</td></tr>
+</tbody></table>` : '';
+
+  const blocoImoveis = sel('pdf-imoveis') && state.imoveis.length ? (() => {
+    const linhas = state.imoveis.map(im => {
+      const av = avaliarImovel(im);
+      const cor = av.cls === 'ok' ? '#27AE60' : av.cls === 'warn' ? '#D4A017' : '#C0392B';
+      return `<tr>
+        <td><b>${im.nome}</b><br><span style="font-size:11px;color:#888">${im.bairro||'—'}</span></td>
+        <td style="text-align:right">${im.aluguel ? fmt(im.aluguel) : '—'}</td>
+        <td style="text-align:center">${im.areaTotal||'—'} m²</td>
+        <td style="text-align:center">${im.quartos||'—'}q / ${im.banheiros||'—'}b</td>
+        <td style="text-align:center">${im.peDireito||'—'} m</td>
+        <td style="text-align:center">${im.piscina==='sim'?'Sim':'Não'}</td>
+        <td style="text-align:right;color:${cor};font-weight:700;font-size:11px">${av.txt}</td>
+      </tr>`;
+    }).join('');
+    return `
+<h2>Imóveis — Comparativo</h2>
+<table>
+  <thead><tr style="background:#f5f5f5">
+    <td style="font-size:10px;text-transform:uppercase;color:#888"><b>Imóvel</b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:right"><b>Aluguel</b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:center"><b>Área</b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:center"><b>Q/B</b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:center"><b>Pé-dir.</b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:center"><b>Piscina</b></td>
+    <td style="font-size:10px;text-transform:uppercase;color:#888;text-align:right"><b>Avaliação</b></td>
+  </tr></thead>
+  <tbody>${linhas}</tbody>
+</table>` ;
+  })() : '';
+
+  const blocoImoveisFicha = sel('pdf-imoveis-ficha') && state.imoveis.length
+    ? state.imoveis.map(im => {
+      const av = avaliarImovel(im);
+      const cor = av.cls === 'ok' ? '#27AE60' : av.cls === 'warn' ? '#D4A017' : '#C0392B';
+      return `
+<div style="page-break-before:always">
+<h2>Ficha de Visita — ${im.nome}</h2>
+<p style="font-size:12px;color:${cor};font-weight:700;margin-bottom:10px">${av.txt}</p>
+<table><tbody>
+  <tr><td>Bairro</td><td style="text-align:right;font-weight:600">${im.bairro||'—'}</td></tr>
+  <tr><td>Aluguel mensal</td><td style="text-align:right;font-weight:600">${im.aluguel?fmt(im.aluguel):'—'}</td></tr>
+  <tr><td>Área total</td><td style="text-align:right;font-weight:600">${im.areaTotal||'—'} m²</td></tr>
+  <tr><td>Área de dormitórios</td><td style="text-align:right;font-weight:600">${im.areaDorm||'—'} m²</td></tr>
+  <tr><td>Quartos</td><td style="text-align:right;font-weight:600">${im.quartos||'—'}</td></tr>
+  <tr><td>Banheiros</td><td style="text-align:right;font-weight:600">${im.banheiros||'—'}</td></tr>
+  <tr><td>Pé-direito</td><td style="text-align:right;font-weight:600">${im.peDireito||'—'} m</td></tr>
+  <tr><td>Piscina</td><td style="text-align:right;font-weight:600">${im.piscina==='sim'?'Sim':'Não'}${im.piscinaEstado?' — '+im.piscinaEstado:''}</td></tr>
+  <tr><td>Manutenção da piscina</td><td style="text-align:right;font-weight:600">${im.piscinaManut||'—'}</td></tr>
+  <tr><td>Estado da elétrica</td><td style="text-align:right;font-weight:600">${im.eletrica||'—'}</td></tr>
+  <tr><td>Vagas de estacionamento</td><td style="text-align:right;font-weight:600">${im.vagas||'—'}</td></tr>
+  <tr><td>Distância até a praia</td><td style="text-align:right;font-weight:600">${im.distPraia||'—'}</td></tr>
+  <tr><td>Permite uso comercial</td><td style="text-align:right;font-weight:600">${im.comercial?'Sim':'Não / a confirmar'}</td></tr>
+  <tr><td>Mobiliada</td><td style="text-align:right;font-weight:600">${im.mobiliada?'Sim':'Não'}</td></tr>
+</tbody></table>
+${im.obs?`<h3>Observações</h3><p style="font-size:12px;line-height:1.7;color:#333">${im.obs}</p>`:''}
+</div>`;
+    }).join('') : '';
 
   const tarefasHTML = Array.from(document.querySelectorAll('.phase')).map(ph => {
     const titulo  = ph.querySelector('.phase-title').textContent.trim();
@@ -905,14 +1098,33 @@ function exportarPDF() {
   <div class="pbar-out"><div class="pbar-in" style="width:${progresso}%"></div></div>
   <p style="font-size:11px;color:#888">Progresso do projeto: <b style="color:#D4A017">${progresso}%</b></p>
 </div>
-${blocoKpis}${blocoCenarios}${blocoInvest}${blocoFixo}${blocoReceita}${blocoSolar}${blocoCrono}${blocoNotas}
+${blocoKpis}${blocoCenarios}${blocoInvest}${blocoFixo}${blocoReceita}${blocoQuartos}${blocoSolar}${blocoImoveis}${blocoImoveisFicha}${blocoCrono}${blocoNotas}
 <p style="text-align:center;font-size:10px;color:#bbb;margin-top:32px;border-top:1px solid #eee;padding-top:12px">Relatório gerado pelo Painel Hostel Roots · ${now}</p>
 </body></html>`;
 
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  setTimeout(() => { win.print(); }, 600);
+  // Renderiza o relatorio dentro da propria pagina (funciona em mobile e no visualizador)
+  const corpo = html
+    .replace(/^[\s\S]*?<body[^>]*>/i, '')
+    .replace(/<\/body>[\s\S]*$/i, '');
+  const estilos = (html.match(/<style>([\s\S]*?)<\/style>/i) || [,''])[1];
+
+  let overlay = document.getElementById('pdfPreview');
+  if (overlay) overlay.remove();
+
+  overlay = document.createElement('div');
+  overlay.id = 'pdfPreview';
+  overlay.innerHTML =
+    '<style>' + estilos.replace(/(^|\})\s*body\s*\{/g, '$1 #pdfPreview .pdf-doc {') + '</style>' +
+    '<div class="pdf-bar">' +
+      '<button class="pdf-close" onclick="fecharPreview()">\u2190 Voltar</button>' +
+      '<span class="pdf-hint">Use \u201cImprimir\u201d e escolha <b>Salvar como PDF</b></span>' +
+      '<button class="pdf-print" onclick="window.print()">\ud83d\udda8 Imprimir</button>' +
+    '</div>' +
+    '<div class="pdf-doc">' + corpo + '</div>';
+
+  document.body.appendChild(overlay);
+  document.body.classList.add('printing');
+  window.scrollTo(0, 0);
 }
 
 // ─── SOLAR ───
@@ -939,6 +1151,95 @@ function calcSolar() {
   document.getElementById('sol-nova-conta').textContent = f(Math.max(0, novaConta)) + '/mês';
 }
 
+
+// ─── IMÓVEIS ───
+const IMOVEL_BLANK = {
+  nome:"Nova casa", bairro:"", aluguel:0, areaTotal:0, areaDorm:0,
+  quartos:4, banheiros:0, peDireito:0, piscina:"nao", piscinaEstado:"",
+  piscinaManut:"", eletrica:"", vagas:0, distPraia:"", comercial:false,
+  mobiliada:false, obs:""
+};
+
+function avaliarImovel(im) {
+  const camas24 = Number(im.areaDorm) >= 66 && Number(im.banheiros) >= 4
+                  && Number(im.peDireito) >= 2.6 && Number(im.quartos) >= 4;
+  const camas20 = Number(im.areaDorm) >= 55 && Number(im.banheiros) >= 3
+                  && Number(im.peDireito) >= 2.5 && Number(im.quartos) >= 3;
+  const preenchido = Number(im.areaDorm) > 0 && Number(im.banheiros) > 0 && Number(im.peDireito) > 0;
+  if (!preenchido) return {cls:"", badge:"", txt:"Preencha os dados"};
+  if (im.comercial === false) return {cls:"bad", badge:"badge-bad", txt:"Sem autorização comercial"};
+  if (camas24) return {cls:"ok",   badge:"badge-ok",   txt:"Comporta 24 camas"};
+  if (camas20) return {cls:"warn", badge:"badge-warn", txt:"Comporta ~20 camas"};
+  return {cls:"bad", badge:"badge-bad", txt:"Não atende ao mínimo"};
+}
+
+function renderImoveis() {
+  const wrap = document.getElementById('imoveis-list');
+  if (!wrap) return;
+  if (!state.imoveis.length) {
+    wrap.innerHTML = '<div class="card" style="text-align:center;color:var(--muted);font-size:13px">Nenhum imóvel cadastrado. Clique em <b>+ Adicionar imóvel</b> antes da primeira visita.</div>';
+    return;
+  }
+  wrap.innerHTML = state.imoveis.map((im, i) => {
+    const av = avaliarImovel(im);
+    const f = (k, label, type, extra) => `
+      <div class="imovel-field">
+        <label>${label}</label>
+        <input type="${type}" value="${im[k] ?? ''}" ${extra||''}
+          onchange="updImovel(${i},'${k}', this.type==='number' ? Number(this.value) : this.value)">
+      </div>`;
+    return `
+    <div class="imovel-card ${av.cls}">
+      <div class="imovel-head">
+        <input class="nome" type="text" value="${im.nome}" onchange="updImovel(${i},'nome',this.value)">
+        ${av.badge ? `<span class="imovel-badge ${av.badge}">${av.txt}</span>` : `<span class="imovel-badge" style="color:#666">${av.txt}</span>`}
+      </div>
+      <div class="imovel-grid">
+        ${f('bairro','Bairro','text')}
+        ${f('aluguel','Aluguel R$/mês','number')}
+        ${f('areaTotal','Área total (m²)','number')}
+        ${f('areaDorm','Área dormitórios (m²)','number')}
+        ${f('quartos','Nº quartos','number')}
+        ${f('banheiros','Nº banheiros','number')}
+        ${f('peDireito','Pé-direito (m)','number','step="0.1"')}
+        ${f('vagas','Vagas estacion.','number')}
+        ${f('distPraia','Distância praia','text')}
+        <div class="imovel-field">
+          <label>Piscina</label>
+          <select onchange="updImovel(${i},'piscina',this.value)">
+            <option value="nao" ${im.piscina==='nao'?'selected':''}>Não tem</option>
+            <option value="sim" ${im.piscina==='sim'?'selected':''}>Tem</option>
+          </select>
+        </div>
+        ${im.piscina==='sim' ? f('piscinaEstado','Estado da piscina','text') : ''}
+        ${im.piscina==='sim' ? f('piscinaManut','Quem mantém?','text') : ''}
+        ${f('eletrica','Estado elétrica','text')}
+        <div class="imovel-field full">
+          <label>Observações da visita</label>
+          <textarea onchange="updImovel(${i},'obs',this.value)">${im.obs||''}</textarea>
+        </div>
+      </div>
+      <div class="imovel-checks">
+        <label><input type="checkbox" ${im.comercial?'checked':''} onchange="updImovel(${i},'comercial',this.checked)"> Permite uso comercial / hostel</label>
+        <label><input type="checkbox" ${im.mobiliada?'checked':''} onchange="updImovel(${i},'mobiliada',this.checked)"> Mobiliada</label>
+      </div>
+      <div class="imovel-actions">
+        <button onclick="removeImovel(${i})">Remover imóvel</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addImovel() {
+  state.imoveis.push(JSON.parse(JSON.stringify(IMOVEL_BLANK)));
+  saveState(); renderImoveis();
+}
+function updImovel(i, k, v) { state.imoveis[i][k] = v; saveState(); renderImoveis(); }
+function removeImovel(i) {
+  if (!confirm('Remover este imóvel?')) return;
+  state.imoveis.splice(i,1); saveState(); renderImoveis();
+}
+
 // ─── INIT ───
 loadState();
 loadCheckboxes();
@@ -950,6 +1251,7 @@ notasEl.value = state.notas || '';
 document.getElementById('p1').classList.add('open');
 updateTotals();
 calcSolar();
+renderImoveis();
 </script>
 </body>
 </html>
