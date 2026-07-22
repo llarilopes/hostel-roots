@@ -115,6 +115,26 @@
   /* PDF BTN */
   .pdf-btn { position: fixed; bottom: 20px; right: 16px; background: linear-gradient(135deg, var(--reggae), #b8880f); border: none; border-radius: 28px; color: #1a1a1a; font-weight: 700; font-size: 12px; padding: 12px 20px; cursor: pointer; font-family: 'Inter', sans-serif; letter-spacing: .5px; box-shadow: 0 4px 18px rgba(212,160,23,.35); z-index: 100; display: flex; align-items: center; gap: 6px; }
   .pdf-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(212,160,23,.5); }
+  /* MODAL PDF */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--mid); border-radius:12px; width:100%; max-width:400px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+  .modal-header { padding:18px 20px 14px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; }
+  .modal-header h3 { font-size:15px; font-weight:700; color:var(--sand); letter-spacing:0.5px; }
+  .modal-close { background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; line-height:1; padding:0; }
+  .modal-close:hover { color:var(--text); }
+  .modal-body { padding:16px 20px; max-height:60vh; overflow-y:auto; }
+  .modal-section-label { font-size:10px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin:12px 0 8px; font-weight:600; }
+  .modal-section-label:first-child { margin-top:0; }
+  .pdf-check-item { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:6px; cursor:pointer; transition:background 0.15s; }
+  .pdf-check-item:hover { background:var(--card); }
+  .pdf-check-item input { accent-color:var(--reggae); width:15px; height:15px; cursor:pointer; flex-shrink:0; }
+  .pdf-check-item label { font-size:13px; color:var(--text); cursor:pointer; flex:1; }
+  .modal-footer { padding:14px 20px; border-top:1px solid #333; display:flex; gap:10px; }
+  .modal-btn-gerar { flex:1; background:linear-gradient(135deg,var(--reggae),#b8880f); border:none; border-radius:8px; color:#1a1a1a; font-weight:700; font-size:13px; padding:12px; cursor:pointer; font-family:'Inter',sans-serif; }
+  .modal-btn-gerar:hover { opacity:0.9; }
+  .modal-btn-cancel { background:none; border:1px solid #444; border-radius:8px; color:var(--muted); font-size:13px; padding:12px 18px; cursor:pointer; font-family:'Inter',sans-serif; }
+  .modal-btn-cancel:hover { border-color:#666; color:var(--text); }
 </style>
 </head>
 <body>
@@ -494,7 +514,46 @@
   <textarea id="notas-texto" placeholder="Ideias, contatos, pendências, decisões importantes..." style="width:100%;min-height:320px;background:var(--card);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;padding:16px;resize:vertical;outline:none;"></textarea>
 </div>
 
-<button class="pdf-btn" onclick="exportarPDF()">🖨 Exportar PDF</button>
+<!-- MODAL CONFIGURAR PDF -->
+<div class="modal-overlay" id="pdfModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🖨 Configurar PDF</h3>
+      <button class="modal-close" onclick="fecharModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <div class="modal-section-label" style="margin:0;">Selecione as seções</div>
+        <div style="display:flex;gap:12px;">
+          <button onclick="toggleTodos(true)" style="font-size:11px;color:var(--surf);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:Inter,sans-serif;padding:0;">Marcar tudo</button>
+          <button onclick="toggleTodos(false)" style="font-size:11px;color:var(--muted);cursor:pointer;text-decoration:underline;background:none;border:none;font-family:Inter,sans-serif;padding:0;">Desmarcar tudo</button>
+        </div>
+      </div>
+
+      <div class="modal-section-label" style="margin-top:14px;">📊 Resumo</div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-kpis" checked><label for="pdf-kpis">KPIs — Investimento, Custo Fixo, Receita, Break-even</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-cenarios" checked><label for="pdf-cenarios">Cenários de Receita (pessimista / realista / otimista)</label></div>
+
+      <div class="modal-section-label">💰 Financeiro</div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-invest" checked><label for="pdf-invest">Investimento Inicial</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-fixo" checked><label for="pdf-fixo">Custos Fixos Mensais</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-receitas" checked><label for="pdf-receitas">Receitas Extras / Mês</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-solar" checked><label for="pdf-solar">☀️ Energia Solar (investimento futuro)</label></div>
+
+      <div class="modal-section-label">📅 Cronograma</div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-crono" checked><label for="pdf-crono">Cronograma completo com tarefas</label></div>
+
+      <div class="modal-section-label">📝 Outros</div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-notas" checked><label for="pdf-notas">Notas</label></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="modal-btn-gerar" onclick="exportarPDF()">Gerar PDF</button>
+    </div>
+  </div>
+</div>
+
+<button class="pdf-btn" onclick="abrirModal()">🖨 Exportar PDF</button>
 
 <script>
 // ─── DADOS PADRÃO ───
@@ -700,38 +759,122 @@ document.querySelectorAll('.param-item input').forEach(inp => {
   inp.addEventListener('input', () => { saveState(); updateTotals(); });
 });
 
+// ─── MODAL PDF ───
+function abrirModal() {
+  document.getElementById('pdfModal').classList.add('open');
+}
+function fecharModal() {
+  document.getElementById('pdfModal').classList.remove('open');
+}
+function toggleTodos(val) {
+  document.querySelectorAll('#pdfModal input[type="checkbox"]').forEach(cb => cb.checked = val);
+}
+document.getElementById('pdfModal').addEventListener('click', function(e) {
+  if (e.target === this) fecharModal();
+});
+
 // ─── EXPORTAR PDF ───
 function exportarPDF() {
+  fecharModal();
+
+  const sel = id => document.getElementById(id)?.checked;
+
   const totalInvest = state.invest.reduce((s, i) => s + Number(i.valor || 0), 0);
-  const totalFixo = state.fixo.reduce((s, i) => s + Number(i.valor || 0), 0);
-  const p = getParams();
-  const rPess = calcCenario(p, p.ocPess);
-  const rReal = calcCenario(p, p.ocReal);
-  const rOtim = calcCenario(p, p.ocOtim);
-  const lucroReal = rReal - totalFixo;
-  const breakEven = lucroReal > 0 ? Math.ceil(totalInvest / lucroReal) : null;
+  const totalFixo   = state.fixo.reduce((s, i) => s + Number(i.valor || 0), 0);
+  const p           = getParams();
+  const rPess       = calcCenario(p, p.ocPess);
+  const rReal       = calcCenario(p, p.ocReal);
+  const rOtim       = calcCenario(p, p.ocOtim);
+  const lucroReal   = rReal - totalFixo;
+  const breakEven   = lucroReal > 0 ? Math.ceil(totalInvest / lucroReal) : null;
 
   const cbs = document.querySelectorAll('.task input[type="checkbox"]');
   let done = 0; cbs.forEach(cb => { if (cb.checked) done++; });
   const progresso = Math.round((done / cbs.length) * 100);
   const now = new Date().toLocaleDateString('pt-BR', {day:'2-digit',month:'long',year:'numeric'});
 
-  const investHTML = state.invest.map(i => `<tr><td>${i.label}</td><td style="text-align:right;font-weight:600">${fmt(i.valor)}</td></tr>`).join('');
-  const fixoHTML = state.fixo.map(i => `<tr><td>${i.label}</td><td style="text-align:right;font-weight:600">${fmt(i.valor)}</td></tr>`).join('');
-  const receitaHTML = state.receita.map(i => `<tr><td>${i.label}</td><td style="text-align:right;font-weight:600">${fmt(i.valor)}</td></tr>`).join('');
+  // — Blocos condicionais —
+  const blocoKpis = sel('pdf-kpis') ? `
+<div class="kpis">
+  <div class="kpi"><div class="kpi-l">Investimento</div><div class="kpi-v">${fmtK(totalInvest)}</div></div>
+  <div class="kpi r"><div class="kpi-l">Custo fixo/mês</div><div class="kpi-v">${fmtK(totalFixo)}</div></div>
+  <div class="kpi s"><div class="kpi-l">Receita realista</div><div class="kpi-v">${fmtK(rReal)}</div></div>
+  <div class="kpi g"><div class="kpi-l">Break-even</div><div class="kpi-v">${breakEven ? breakEven + ' m' : '—'}</div></div>
+</div>` : '';
+
+  const blocoCenarios = sel('pdf-cenarios') ? `
+<h2>Projeção de Receita — Cenários</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
+  <div style="background:#fff3cd;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #C0392B">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Pessimista · ${p.ocPess}%</div>
+    <div style="font-size:22px;font-weight:700;color:#C0392B">${fmtK(rPess)}</div><div style="font-size:11px;color:#888">/mês</div>
+  </div>
+  <div style="background:#fff8e8;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #D4A017">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Realista · ${p.ocReal}%</div>
+    <div style="font-size:22px;font-weight:700;color:#D4A017">${fmtK(rReal)}</div><div style="font-size:11px;color:#888">/mês</div>
+  </div>
+  <div style="background:#eafaf1;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #27AE60">
+    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Otimista · ${p.ocOtim}%</div>
+    <div style="font-size:22px;font-weight:700;color:#27AE60">${fmtK(rOtim)}</div><div style="font-size:11px;color:#888">/mês</div>
+  </div>
+</div>
+<table><tbody>
+  <tr><td>Lucro líquido mensal (realista)</td><td style="text-align:right;font-weight:700;color:${lucroReal>=0?'#27AE60':'#C0392B'}">${lucroReal>=0?'+':''}${fmt(lucroReal)}/mês</td></tr>
+  <tr><td>Custo fixo mensal</td><td style="text-align:right;font-weight:600">${fmt(totalFixo)}</td></tr>
+  <tr><td>Break-even estimado (realista)</td><td style="text-align:right;font-weight:700;color:#D4A017">${breakEven ? breakEven + ' meses' : 'não atingido'}</td></tr>
+  <tr><td>Diária média ponderada</td><td style="text-align:right;font-weight:600">R$ ${((p.diBase*5+p.diFds*2)/7).toFixed(0)}</td></tr>
+</tbody></table>` : '';
+
+  const investHTML  = state.invest.map(i => `<tr><td>${i.label}</td><td style="text-align:right;font-weight:600">${fmt(i.valor)}</td></tr>`).join('');
+  const blocoInvest = sel('pdf-invest') ? `
+<h2>Investimento Inicial</h2>
+<table><tbody>${investHTML}<tr class="total-row"><td>Total</td><td style="text-align:right">${fmt(totalInvest)}</td></tr></tbody></table>` : '';
+
+  const fixoHTML  = state.fixo.map(i => `<tr><td>${i.label}</td><td style="text-align:right;font-weight:600">${fmt(i.valor)}</td></tr>`).join('');
+  const blocoFixo = sel('pdf-fixo') ? `
+<h2>Custos Fixos Mensais</h2>
+<table><tbody>${fixoHTML}<tr class="total-row"><td>Total</td><td style="text-align:right">${fmt(totalFixo)}</td></tr></tbody></table>` : '';
+
+  const receitaHTML  = state.receita.map(i => `<tr><td>${i.label}</td><td style="text-align:right;font-weight:600">${fmt(i.valor)}</td></tr>`).join('');
+  const blocoReceita = sel('pdf-receitas') ? `
+<h2>Receitas Extras / Mês</h2>
+<table><tbody>${receitaHTML}<tr class="total-row"><td>Total extras</td><td style="text-align:right">${fmt(state.receita.reduce((s,i)=>s+Number(i.valor||0),0))}</td></tr></tbody></table>` : '';
+
+  const blocoSolar = sel('pdf-solar') ? (() => {
+    const kit    = Number(document.getElementById('sol-kit')?.value || 22000);
+    const mdo    = Number(document.getElementById('sol-mdo')?.value || 3000);
+    const kwh    = Number(document.getElementById('sol-kwh')?.value || 1000);
+    const tarifa = Number(document.getElementById('sol-tarifa')?.value || 0.85);
+    const cob    = Number(document.getElementById('sol-cob')?.value || 85) / 100;
+    const total  = kit + mdo;
+    const eco    = kwh * tarifa * cob;
+    const pb     = eco > 0 ? Math.ceil(total / eco) : '—';
+    return `
+<h2>☀️ Energia Solar — Investimento Futuro</h2>
+<table><tbody>
+  <tr><td>Investimento total (kit + instalação)</td><td style="text-align:right;font-weight:600">${fmt(total)}</td></tr>
+  <tr><td>Economia mensal estimada</td><td style="text-align:right;font-weight:600;color:#27AE60">${fmt(eco)}/mês</td></tr>
+  <tr><td>Economia anual</td><td style="text-align:right;font-weight:600;color:#27AE60">${fmt(eco*12)}/ano</td></tr>
+  <tr><td>Payback estimado</td><td style="text-align:right;font-weight:700;color:#D4A017">${pb} meses</td></tr>
+  <tr><td>Período recomendado para instalar</td><td style="text-align:right;color:#888">6–12 meses após abertura</td></tr>
+</tbody></table>`;
+  })() : '';
 
   const tarefasHTML = Array.from(document.querySelectorAll('.phase')).map(ph => {
-    const titulo = ph.querySelector('.phase-title').textContent.trim();
+    const titulo  = ph.querySelector('.phase-title').textContent.trim();
     const periodo = ph.querySelector('.phase-badge').textContent.trim();
     const tarefas = Array.from(ph.querySelectorAll('.task')).map(t => {
-      const done = t.querySelector('input').checked;
+      const ok    = t.querySelector('input').checked;
       const texto = t.querySelector('.task-text').textContent;
-      return `<tr><td style="color:${done ? '#888' : '#333'};text-decoration:${done ? 'line-through' : 'none'}">${done ? '✓' : '○'} ${texto}</td></tr>`;
+      return `<tr><td style="color:${ok?'#888':'#333'};text-decoration:${ok?'line-through':'none'}">${ok?'✓':'○'} ${texto}</td></tr>`;
     }).join('');
     return `<h3 style="margin:18px 0 8px;font-size:13px;color:#333">${titulo} <span style="font-size:11px;color:#888;font-weight:400">${periodo}</span></h3><table style="width:100%;border-collapse:collapse">${tarefas}</table>`;
   }).join('');
+  const blocoCrono = sel('pdf-crono') ? `<h2>Cronograma</h2>${tarefasHTML}` : '';
 
-  const notasHTML = state.notas ? `<h2 style="font-size:14px;color:#555;border-top:2px solid #D4A017;padding-top:14px;margin-top:20px">Notas</h2><pre style="font-family:Arial,sans-serif;font-size:13px;white-space:pre-wrap;line-height:1.7;color:#333">${state.notas}</pre>` : '';
+  const blocoNotas = sel('pdf-notas') && state.notas
+    ? `<h2>Notas</h2><pre style="font-family:Arial,sans-serif;font-size:13px;white-space:pre-wrap;line-height:1.7;color:#333">${state.notas}</pre>`
+    : '';
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -740,6 +883,7 @@ function exportarPDF() {
   body{font-family:Arial,sans-serif;font-size:13px;color:#222;max-width:720px;margin:0 auto;padding:32px 24px}
   h1{font-size:28px;letter-spacing:3px;color:#1a1a1a;margin-bottom:2px}
   h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#888;border-top:2px solid #D4A017;padding-top:12px;margin-top:20px;margin-bottom:10px}
+  h3{font-size:13px;color:#333;margin:18px 0 8px}
   table{width:100%;border-collapse:collapse;margin-bottom:8px}
   td{padding:7px 10px;border-bottom:1px solid #eee;font-size:13px}
   .total-row td{font-weight:700;background:#fff8e8;border-top:2px solid #D4A017}
@@ -761,61 +905,7 @@ function exportarPDF() {
   <div class="pbar-out"><div class="pbar-in" style="width:${progresso}%"></div></div>
   <p style="font-size:11px;color:#888">Progresso do projeto: <b style="color:#D4A017">${progresso}%</b></p>
 </div>
-
-<div class="kpis">
-  <div class="kpi"><div class="kpi-l">Investimento</div><div class="kpi-v">${fmtK(totalInvest)}</div></div>
-  <div class="kpi r"><div class="kpi-l">Custo fixo/mês</div><div class="kpi-v">${fmtK(totalFixo)}</div></div>
-  <div class="kpi s"><div class="kpi-l">Receita realista</div><div class="kpi-v">${fmtK(rReal)}</div></div>
-  <div class="kpi g"><div class="kpi-l">Break-even</div><div class="kpi-v">${breakEven ? breakEven + ' m' : '—'}</div></div>
-</div>
-
-<h2>Projeção de Receita — Cenários</h2>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px">
-  <div style="background:#fff3cd;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #C0392B">
-    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Pessimista · ${p.ocPess}%</div>
-    <div style="font-size:22px;font-weight:700;color:#C0392B">${fmtK(rPess)}</div>
-    <div style="font-size:11px;color:#888">/mês</div>
-  </div>
-  <div style="background:#fff8e8;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #D4A017">
-    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Realista · ${p.ocReal}%</div>
-    <div style="font-size:22px;font-weight:700;color:#D4A017">${fmtK(rReal)}</div>
-    <div style="font-size:11px;color:#888">/mês</div>
-  </div>
-  <div style="background:#eafaf1;border-radius:6px;padding:12px;text-align:center;border-top:3px solid #27AE60">
-    <div style="font-size:9px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px">Otimista · ${p.ocOtim}%</div>
-    <div style="font-size:22px;font-weight:700;color:#27AE60">${fmtK(rOtim)}</div>
-    <div style="font-size:11px;color:#888">/mês</div>
-  </div>
-</div>
-<table><tbody>
-  <tr><td>Lucro líquido mensal (cenário realista)</td><td style="text-align:right;font-weight:700;color:${lucroReal>=0?'#27AE60':'#C0392B'}">${lucroReal>=0?'+':''}${fmt(lucroReal)}/mês</td></tr>
-  <tr><td>Custo fixo mensal</td><td style="text-align:right;font-weight:600">${fmt(totalFixo)}</td></tr>
-  <tr><td>Break-even estimado (cenário realista)</td><td style="text-align:right;font-weight:700;color:#D4A017">${breakEven ? breakEven + ' meses' : 'não atingido'}</td></tr>
-  <tr><td>Diária média ponderada (seg–dom)</td><td style="text-align:right;font-weight:600">R$ ${((p.diBase*5+p.diFds*2)/7).toFixed(0)}</td></tr>
-</tbody></table>
-
-<h2>Parâmetros Utilizados na Simulação</h2>
-<table><tbody>
-  <tr><td>Número de camas</td><td style="text-align:right;font-weight:600">${p.camas}</td></tr>
-  <tr><td>Diária seg–qui</td><td style="text-align:right;font-weight:600">${fmt(p.diBase)}</td></tr>
-  <tr><td>Diária fim de semana</td><td style="text-align:right;font-weight:600">${fmt(p.diFds)}</td></tr>
-  <tr><td>Bar por cama/dia (média)</td><td style="text-align:right;font-weight:600">${fmt(p.bar)}</td></tr>
-  <tr><td>Ocupação pessimista / realista / otimista</td><td style="text-align:right;font-weight:600">${p.ocPess}% / ${p.ocReal}% / ${p.ocOtim}%</td></tr>
-</tbody></table>
-
-<h2>Receitas Extras / Mês</h2>
-<table><tbody>${receitaHTML}<tr class="total-row"><td>Total extras</td><td style="text-align:right">${fmt(state.receita.reduce((s,i)=>s+Number(i.valor||0),0))}</td></tr></tbody></table>
-
-<h2>Investimento Inicial</h2>
-<table><tbody>${investHTML}<tr class="total-row"><td>Total</td><td style="text-align:right">${fmt(totalInvest)}</td></tr></tbody></table>
-
-<h2>Custos Fixos Mensais</h2>
-<table><tbody>${fixoHTML}<tr class="total-row"><td>Total</td><td style="text-align:right">${fmt(totalFixo)}</td></tr></tbody></table>
-
-<h2>Cronograma</h2>
-${tarefasHTML}
-${notasHTML}
-
+${blocoKpis}${blocoCenarios}${blocoInvest}${blocoFixo}${blocoReceita}${blocoSolar}${blocoCrono}${blocoNotas}
 <p style="text-align:center;font-size:10px;color:#bbb;margin-top:32px;border-top:1px solid #eee;padding-top:12px">Relatório gerado pelo Painel Hostel Roots · ${now}</p>
 </body></html>`;
 
