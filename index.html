@@ -1386,12 +1386,13 @@ function renderSazon() {
 
   let alertaHTML = '';
   if (mesesNegativo > 0) {
-    alertaHTML = `<div class="caixa-alerta">
-      ⚠️ <b>${mesesNegativo} ${mesesNegativo === 1 ? 'mês' : 'meses'} no vermelho</b> na projeção atual.
-      Déficit acumulado nesses meses: <b>${fmt(Math.abs(deficitTotal))}</b>.
-      Seu capital de giro atual cobre <b>${Math.round(Math.abs(state.invest.find(i=>i.label.toLowerCase().includes('capital'))?.valor||0) / Math.abs(deficitTotal / mesesNegativo))} meses</b> de baixa.
-      Considere reservar pelo menos <b>${fmt(Math.abs(deficitTotal) * 1.2)}</b> como colchão de segurança.
-    </div>`;
+    const mesesCobre = Math.round(Math.abs(state.invest.find(i=>i.label.toLowerCase().includes('capital'))?.valor||0) / Math.abs(deficitTotal / mesesNegativo));
+    alertaHTML = '<div class="caixa-alerta">'
+      + '⚠️ <b>' + mesesNegativo + ' ' + (mesesNegativo === 1 ? 'mês' : 'meses') + ' no vermelho</b> na projeção atual.'
+      + ' Déficit acumulado nesses meses: <b>' + fmt(Math.abs(deficitTotal)) + '</b>.'
+      + ' Seu capital de giro atual cobre <b>' + mesesCobre + ' meses</b> de baixa.'
+      + ' Considere reservar pelo menos <b>' + fmt(Math.abs(deficitTotal) * 1.2) + '</b> como colchão de segurança.'
+      + '</div>';
   } else {
     alertaHTML = `<div class="caixa-ok">✓ Todos os meses projetados com lucro positivo nesta configuração.</div>`;
   }
