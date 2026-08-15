@@ -689,7 +689,21 @@ const DEFAULT_FIXO = [
   {label:"Piscina — reserva p/ reparos", valor:100},
 ];
 const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-const DEFAULT_SAZON = [80, 85, 35, 35, 38, 38, 65, 45, 45, 50, 55, 75];
+const DEFAULT_SAZON = [82, 80, 45, 38, 42, 72, 65, 45, 45, 52, 60, 78];
+const EVENTOS_MES = [
+  'Fest Verão · Projeto Verão Atalaia · Procissão Bom Jesus dos Navegantes · Alta temporada de praia',
+  'Verão Sergipe · Carnaju (carnaval oficial) · Pré-Caju · Alta temporada',
+  'Aniversário de Aracaju (17/mar) · Corrida Cidade de Aracaju · Carnaval (data móvel) · Baixa começa',
+  'Baixa temporada · Semana Santa (data móvel) · Oportunidade: pacotes de feriado',
+  'Baixa temporada · Pré-São João · Movimento crescente de turismo junino',
+  'Arraiá do Povo · Forró Caju · Festa de São João · Alta ocupação junina',
+  'Férias escolares · Alta temporada · Forte demanda de famílias e mochileiros',
+  'Baixa temporada · Boa janela para manutenção e melhorias',
+  'Baixa temporada · Início de recuperação · Semana da Pátria (7/set)',
+  'Vila da Criança (orla Atalaia) · Segundona do Turista · Recuperação de demanda',
+  'Pré-Caju (prévia de carnaval) · Movimento crescente · Aquecimento para dezembro',
+  'Natal Iluminado · Festival do Caranguejo · Réveillon · Alta temporada começa',
+];
 
 const DEFAULT_RECEITA = [
   {label:"Bar temático (estimativa mensal)", valor:18000},
@@ -1337,6 +1351,7 @@ function renderSazon() {
           <div class="sazon-bar" style="width:${barW}%;background:${cor}"></div>
         </div>
         <div class="sazon-resultado" style="color:${cor}">${lucro >= 0 ? '+' : ''}${fmtK(lucro)}</div>
+        <div style="font-size:10px;color:#666;margin-top:5px;line-height:1.4">${EVENTOS_MES[i]}</div>
       </div>`;
   }).join('');
 
