@@ -156,6 +156,28 @@
   .finance-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--card); border-radius: 6px; margin-bottom: 6px; font-size: 13px; }
   .finance-row span:last-child { font-weight: 600; color: var(--sand); }
 
+  /* FLUXO SAZONAL */
+  .sazon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .sazon-mes { background: var(--card); border-radius: 6px; padding: 10px 10px 8px; }
+  .sazon-mes-nome { font-size: 10px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); margin-bottom: 6px; }
+  .sazon-mes input { width: 100%; background: #1a1a1a; border: 1px solid #3a3a3a; border-radius: 4px; color: var(--sand); font-size: 13px; font-family: 'Inter', sans-serif; padding: 5px 8px; outline: none; text-align: right; }
+  .sazon-mes input:focus { border-color: var(--reggae); }
+  .sazon-bar-wrap { margin-top: 6px; height: 4px; background: #2e2e2e; border-radius: 2px; overflow: hidden; }
+  .sazon-bar { height: 100%; border-radius: 2px; transition: width .3s; }
+  .sazon-resultado { font-size: 10px; margin-top: 4px; text-align: right; font-weight: 600; }
+
+  .fluxo-chart { margin: 0 0 14px; }
+  .fluxo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+  .fluxo-label { font-size: 11px; color: var(--muted); width: 28px; flex-shrink: 0; }
+  .fluxo-bar-track { flex: 1; height: 22px; background: #1a1a1a; border-radius: 3px; overflow: hidden; position: relative; }
+  .fluxo-bar-receita { height: 100%; border-radius: 3px; transition: width .4s; position: absolute; top: 0; left: 0; }
+  .fluxo-bar-custo { position: absolute; top: 6px; left: 0; height: 10px; background: rgba(192,57,43,.5); border-radius: 0 2px 2px 0; }
+  .fluxo-valor { font-size: 10px; font-weight: 600; width: 70px; text-align: right; flex-shrink: 0; }
+  .fluxo-lucro { font-size: 10px; width: 72px; text-align: right; flex-shrink: 0; }
+
+  .caixa-alerta { background: #2d0a0a; border: 1px solid var(--rock); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; font-size: 12.5px; color: #e88; }
+  .caixa-ok { background: #0a2d0a; border: 1px solid var(--green); border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; font-size: 12.5px; color: #8e8; }
+
   /* PDF BTN */
   .pdf-btn { position: fixed; bottom: 20px; right: 16px; background: linear-gradient(135deg, var(--reggae), #b8880f); border: none; border-radius: 28px; color: #1a1a1a; font-weight: 700; font-size: 12px; padding: 12px 20px; cursor: pointer; font-family: 'Inter', sans-serif; letter-spacing: .5px; box-shadow: 0 4px 18px rgba(212,160,23,.35); z-index: 100; display: flex; align-items: center; gap: 6px; }
   .pdf-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(212,160,23,.5); }
@@ -354,6 +376,19 @@
     <div id="receita-list"></div>
     <button class="fin-add" onclick="addItem('receita')">+ adicionar fonte de receita</button>
     <div class="fin-total"><span>Total Receitas Extras</span><span id="receita-total">—</span></div>
+  </div>
+
+  <!-- FLUXO DE CAIXA SAZONAL -->
+  <div class="fin-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+      <div class="fin-title" style="margin-bottom:0">📅 Fluxo de Caixa — Sazonalidade Mensal</div>
+      <button onclick="resetarSazon()" style="background:none;border:1px solid #444;border-radius:5px;color:var(--muted);font-size:11px;padding:4px 10px;cursor:pointer;font-family:'Inter',sans-serif;">↺ padrão Aracaju</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">Ajuste a ocupação estimada para cada mês considerando a sazonalidade real de Aracaju. Meses no vermelho = precisa de capital de giro.</p>
+    <div class="sazon-grid" id="sazon-grid"></div>
+    <div class="fin-title" style="margin-bottom:10px;margin-top:4px;">Projeção Anual — Receita vs. Custo Fixo</div>
+    <div class="fluxo-chart" id="fluxo-chart"></div>
+    <div id="sazon-resumo"></div>
   </div>
 
   <!-- ENERGIA SOLAR — INVESTIMENTO FUTURO -->
@@ -653,6 +688,9 @@ const DEFAULT_FIXO = [
   {label:"Piscina — seguro adicional", valor:80},
   {label:"Piscina — reserva p/ reparos", valor:100},
 ];
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const DEFAULT_SAZON = [80, 85, 35, 35, 38, 38, 65, 45, 45, 50, 55, 75];
+
 const DEFAULT_RECEITA = [
   {label:"Bar temático (estimativa mensal)", valor:18000},
   {label:"Pacotes surf + hospedagem", valor:5000},
@@ -670,9 +708,10 @@ function loadState() {
   try {
     const s = localStorage.getItem('hostelroots_v4');
     if (s) { state = JSON.parse(s); if(!state.imoveis) state.imoveis = []; }
-    else state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [] };
+    else state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [], sazon: [...DEFAULT_SAZON] };
+    if (!state.sazon) state.sazon = [...DEFAULT_SAZON];
   } catch(e) {
-    state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [] };
+    state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [], sazon: [...DEFAULT_SAZON] };
   }
 }
 
@@ -836,7 +875,7 @@ notasEl.addEventListener('input', () => { state.notas = notasEl.value; saveState
 
 // ─── PARÂMETROS ───
 document.querySelectorAll('.param-item input').forEach(inp => {
-  inp.addEventListener('input', () => { saveState(); updateTotals(); });
+  inp.addEventListener('input', () => { saveState(); updateTotals(); renderSazon(); });
 });
 
 // ─── MODAL PDF ───
@@ -924,6 +963,28 @@ function exportarPDF() {
   const blocoReceita = sel('pdf-receitas') ? `
 <h2>Receitas Extras / Mês</h2>
 <table><tbody>${receitaHTML}<tr class="total-row"><td>Total extras</td><td style="text-align:right">${fmt(state.receita.reduce((s,i)=>s+Number(i.valor||0),0))}</td></tr></tbody></table>` : '';
+
+  // Fluxo sazonal para PDF
+  const receitasMesPDF = state.sazon.map(oc => calcCenario(p, oc));
+  const receitaAnualPDF = receitasMesPDF.reduce((s,r)=>s+r,0);
+  const lucroAnualPDF = receitaAnualPDF - totalFixo * 12;
+  const mesesNegPDF = receitasMesPDF.filter(r => r < totalFixo).length;
+  const deficitPDF = receitasMesPDF.reduce((s,r)=>s+Math.min(0,r-totalFixo),0);
+  const sazonLinhas = MESES.map((m,i) => {
+    const rec = receitasMesPDF[i];
+    const luc = rec - totalFixo;
+    const cor = luc >= 0 ? '#27AE60' : '#C0392B';
+    return `<tr><td>${m} — ${state.sazon[i]}% ocup.</td><td style="text-align:right">${fmt(rec)}</td><td style="text-align:right;font-weight:700;color:${cor}">${luc>=0?'+':''}${fmt(luc)}</td></tr>`;
+  }).join('');
+  const blocoSazon = `
+<h2>Fluxo de Caixa Sazonal (12 meses)</h2>
+<table><tbody>
+<tr style="font-size:10px;color:#888"><td>Mês / Ocupação</td><td style="text-align:right">Receita estimada</td><td style="text-align:right">Resultado</td></tr>
+${sazonLinhas}
+<tr class="total-row"><td>Total anual</td><td style="text-align:right">${fmt(receitaAnualPDF)}</td><td style="text-align:right;color:${lucroAnualPDF>=0?'#27AE60':'#C0392B'}">${lucroAnualPDF>=0?'+':''}${fmt(lucroAnualPDF)}</td></tr>
+</tbody></table>
+${mesesNegPDF > 0 ? `<div style="background:#fff3cd;border:1px solid #e0a800;border-radius:6px;padding:10px 14px;margin-top:8px;font-size:12px;color:#7a5200">⚠️ <b>${mesesNegPDF} meses com resultado negativo.</b> Déficit acumulado: <b>${fmt(Math.abs(deficitPDF))}</b>. Recomenda-se reserva mínima de <b>${fmt(Math.abs(deficitPDF)*1.2)}</b> em capital de giro.</div>` : `<div style="background:#d4edda;border:1px solid #27AE60;border-radius:6px;padding:10px 14px;margin-top:8px;font-size:12px;color:#155724">✓ Todos os meses projetados com resultado positivo.</div>`}
+`;
 
   const blocoSolar = sel('pdf-solar') ? (() => {
     const kit    = Number(document.getElementById('sol-kit')?.value || 22000);
@@ -1098,7 +1159,7 @@ ${im.obs?`<h3>Observações</h3><p style="font-size:12px;line-height:1.7;color:#
   <div class="pbar-out"><div class="pbar-in" style="width:${progresso}%"></div></div>
   <p style="font-size:11px;color:#888">Progresso do projeto: <b style="color:#D4A017">${progresso}%</b></p>
 </div>
-${blocoKpis}${blocoCenarios}${blocoInvest}${blocoFixo}${blocoReceita}${blocoQuartos}${blocoSolar}${blocoImoveis}${blocoImoveisFicha}${blocoCrono}${blocoNotas}
+${blocoKpis}${blocoCenarios}${blocoInvest}${blocoFixo}${blocoReceita}${blocoSazon}${blocoQuartos}${blocoSolar}${blocoImoveis}${blocoImoveisFicha}${blocoCrono}${blocoNotas}
 <p style="text-align:center;font-size:10px;color:#bbb;margin-top:32px;border-top:1px solid #eee;padding-top:12px">Relatório gerado pelo Painel Hostel Roots · ${now}</p>
 </body></html>`;
 
@@ -1240,6 +1301,97 @@ function removeImovel(i) {
   state.imoveis.splice(i,1); saveState(); renderImoveis();
 }
 
+// ─── FLUXO SAZONAL ───
+function resetarSazon() {
+  state.sazon = [...DEFAULT_SAZON];
+  saveState();
+  renderSazon();
+}
+
+function renderSazon() {
+  const p = getParams();
+  const totalFixo = state.fixo.reduce((s, i) => s + Number(i.valor || 0), 0);
+  const totalExtras = state.receita.reduce((s, i) => s + Number(i.valor || 0), 0);
+  const grid = document.getElementById('sazon-grid');
+  const chart = document.getElementById('fluxo-chart');
+  const resumo = document.getElementById('sazon-resumo');
+  if (!grid) return;
+
+  const receitasMes = state.sazon.map(oc => calcCenario(p, oc));
+  const maxReceita = Math.max(...receitasMes);
+
+  // Grid de inputs por mês
+  grid.innerHTML = MESES.map((m, i) => {
+    const oc = state.sazon[i];
+    const rec = receitasMes[i];
+    const lucro = rec - totalFixo;
+    const cor = lucro >= 0 ? 'var(--green)' : 'var(--rock)';
+    const barW = Math.round((rec / maxReceita) * 100);
+    return `
+      <div class="sazon-mes">
+        <div class="sazon-mes-nome">${m}</div>
+        <input type="number" value="${oc}" min="0" max="100"
+          onchange="updateSazon(${i}, this.value)"
+          oninput="updateSazon(${i}, this.value)">
+        <div class="sazon-bar-wrap">
+          <div class="sazon-bar" style="width:${barW}%;background:${cor}"></div>
+        </div>
+        <div class="sazon-resultado" style="color:${cor}">${lucro >= 0 ? '+' : ''}${fmtK(lucro)}</div>
+      </div>`;
+  }).join('');
+
+  // Gráfico de barras horizontal
+  chart.innerHTML = MESES.map((m, i) => {
+    const rec = receitasMes[i];
+    const lucro = rec - totalFixo;
+    const cor = lucro >= 0 ? 'var(--green)' : 'var(--rock)';
+    const barW = Math.round((rec / maxReceita) * 100);
+    const custoW = Math.round((totalFixo / maxReceita) * 100);
+    return `
+      <div class="fluxo-row">
+        <div class="fluxo-label">${m}</div>
+        <div class="fluxo-bar-track">
+          <div class="fluxo-bar-receita" style="width:${barW}%;background:${lucro >= 0 ? '#27AE6044' : '#C0392B44'}"></div>
+          <div class="fluxo-bar-custo" style="width:${custoW}%"></div>
+        </div>
+        <div class="fluxo-valor" style="color:var(--sand)">${fmtK(rec)}</div>
+        <div class="fluxo-lucro" style="color:${cor};font-weight:600">${lucro >= 0 ? '+' : ''}${fmtK(lucro)}</div>
+      </div>`;
+  }).join('');
+
+  // Resumo anual
+  const receitaAnual = receitasMes.reduce((s, r) => s + r, 0);
+  const custoAnual = totalFixo * 12;
+  const lucroAnual = receitaAnual - custoAnual;
+  const mesesNegativo = receitasMes.filter(r => r < totalFixo).length;
+  const deficitTotal = receitasMes.reduce((s, r) => s + Math.min(0, r - totalFixo), 0);
+
+  let alertaHTML = '';
+  if (mesesNegativo > 0) {
+    alertaHTML = `<div class="caixa-alerta">
+      ⚠️ <b>${mesesNegativo} ${mesesNegativo === 1 ? 'mês' : 'meses'} no vermelho</b> na projeção atual.
+      Déficit acumulado nesses meses: <b>${fmt(Math.abs(deficitTotal))}</b>.
+      Seu capital de giro atual cobre <b>${Math.round(Math.abs(state.invest.find(i=>i.label.toLowerCase().includes('capital'))?.valor||0) / Math.abs(deficitTotal / mesesNegativo))} meses</b> de baixa.
+      Considere reservar pelo menos <b>${fmt(Math.abs(deficitTotal) * 1.2)}</b> como colchão de segurança.
+    </div>`;
+  } else {
+    alertaHTML = `<div class="caixa-ok">✓ Todos os meses projetados com lucro positivo nesta configuração.</div>`;
+  }
+
+  resumo.innerHTML = `
+    ${alertaHTML}
+    <div class="finance-row"><span>Receita total projetada (12 meses)</span><span>${fmt(receitaAnual)}</span></div>
+    <div class="finance-row"><span>Custo fixo total (12 meses)</span><span>${fmt(custoAnual)}</span></div>
+    <div class="finance-row"><span>Resultado anual estimado</span><span style="color:${lucroAnual >= 0 ? 'var(--green)' : 'var(--rock)'};font-weight:700">${lucroAnual >= 0 ? '+' : ''}${fmt(lucroAnual)}</span></div>
+  `;
+}
+
+function updateSazon(i, val) {
+  state.sazon[i] = Math.max(0, Math.min(100, Number(val) || 0));
+  saveState();
+  renderSazon();
+}
+
 // ─── INIT ───
 loadState();
 loadCheckboxes();
@@ -1248,6 +1400,7 @@ renderList('invest');
 renderList('fixo');
 renderList('receita');
 notasEl.value = state.notas || '';
+renderSazon();
 document.getElementById('p1').classList.add('open');
 updateTotals();
 calcSolar();
