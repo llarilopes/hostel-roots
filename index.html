@@ -643,6 +643,7 @@
       <div class="pdf-check-item"><input type="checkbox" id="pdf-invest" checked><label for="pdf-invest">Investimento Inicial</label></div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-fixo" checked><label for="pdf-fixo">Custos Fixos Mensais</label></div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-receitas" checked><label for="pdf-receitas">Receitas Extras / Mês</label></div>
+      <div class="pdf-check-item"><input type="checkbox" id="pdf-sazon" checked><label for="pdf-sazon">📅 Fluxo de Caixa Sazonal (12 meses)</label></div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-solar" checked><label for="pdf-solar">☀️ Energia Solar (payback e recomendação)</label></div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-quartos" checked><label for="pdf-quartos">🛏 Configuração dos quartos (24 camas)</label></div>
       <div class="pdf-check-item"><input type="checkbox" id="pdf-imoveis" checked><label for="pdf-imoveis">🏠 Imóveis — comparativo</label></div>
@@ -990,7 +991,7 @@ function exportarPDF() {
     const cor = luc >= 0 ? '#27AE60' : '#C0392B';
     return `<tr><td>${m} — ${state.sazon[i]}% ocup.</td><td style="text-align:right">${fmt(rec)}</td><td style="text-align:right;font-weight:700;color:${cor}">${luc>=0?'+':''}${fmt(luc)}</td></tr>`;
   }).join('');
-  const blocoSazon = `
+  const blocoSazon = sel('pdf-sazon') ? `
 <h2>Fluxo de Caixa Sazonal (12 meses)</h2>
 <table><tbody>
 <tr style="font-size:10px;color:#888"><td>Mês / Ocupação</td><td style="text-align:right">Receita estimada</td><td style="text-align:right">Resultado</td></tr>
