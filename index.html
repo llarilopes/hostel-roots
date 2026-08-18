@@ -794,7 +794,7 @@ function calcCenario(p, ocupPct) {
   const diariaMedia = (p.diBase * 5 + p.diFds * 2) / 7;
   const hosp = p.camas * diariaMedia * 30 * (ocupPct / 100);
   const bar = p.camas * p.bar * 30 * (ocupPct / 100);
-  const extras = state.receita.reduce((s, i) => s + Number(i.valor || 0), 0);
+  const extras = state.receita.reduce((s, i) => s + Number(i.valor || 0), 0) * (ocupPct / 100);
   return hosp + bar + extras;
 }
 
