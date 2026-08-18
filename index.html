@@ -725,6 +725,7 @@ function loadState() {
     if (s) { state = JSON.parse(s); if(!state.imoveis) state.imoveis = []; }
     else state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [], sazon: [...DEFAULT_SAZON] };
     if (!state.sazon) state.sazon = [...DEFAULT_SAZON];
+    if (!state.params) state.params = null;
   } catch(e) {
     state = { invest: JSON.parse(JSON.stringify(DEFAULT_INVEST)), fixo: JSON.parse(JSON.stringify(DEFAULT_FIXO)), receita: JSON.parse(JSON.stringify(DEFAULT_RECEITA)), notas: "", imoveis: [], sazon: [...DEFAULT_SAZON] };
   }
@@ -890,7 +891,21 @@ notasEl.addEventListener('input', () => { state.notas = notasEl.value; saveState
 
 // ─── PARÂMETROS ───
 document.querySelectorAll('.param-item input').forEach(inp => {
-  inp.addEventListener('input', () => { saveState(); updateTotals(); renderSazon(); });
+  inp.addEventListener('input', () => {
+    // Salva parâmetros no estado
+    state.params = {
+      camas: Number(document.getElementById('p-camas').value) || 24,
+      diariaBase: Number(document.getElementById('p-diaria-base').value) || 75,
+      diariaFds: Number(document.getElementById('p-diaria-fds').value) || 120,
+      bar: Number(document.getElementById('p-bar').value) || 40,
+      ocPess: Number(document.getElementById('p-oc-pess').value) || 40,
+      ocReal: Number(document.getElementById('p-oc-real').value) || 65,
+      ocOtim: Number(document.getElementById('p-oc-otim').value) || 90,
+    };
+    saveState();
+    updateTotals();
+    renderSazon();
+  });
 });
 
 // ─── MODAL PDF ───
@@ -1413,6 +1428,16 @@ function updateSazon(i, val) {
 
 // ─── INIT ───
 loadState();
+// Restaura parâmetros salvos nos inputs
+if (state.params) {
+  document.getElementById('p-camas').value = state.params.camas;
+  document.getElementById('p-diaria-base').value = state.params.diariaBase;
+  document.getElementById('p-diaria-fds').value = state.params.diariaFds;
+  document.getElementById('p-bar').value = state.params.bar;
+  document.getElementById('p-oc-pess').value = state.params.ocPess;
+  document.getElementById('p-oc-real').value = state.params.ocReal;
+  document.getElementById('p-oc-otim').value = state.params.ocOtim;
+}
 loadCheckboxes();
 updateProgress();
 renderList('invest');
